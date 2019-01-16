@@ -1,0 +1,146 @@
+name: mir-test-tools
+version: Mir
+version-script: |
+  LANG=C apt-cache policy mir-test-tools | sed -rne 's/^\s+Candidate:\s+([^-]*)-.+$/\1/p'
+summary: Mir test scripts and applications
+description: Mir test scripts and applications
+confinement: strict
+grade: devel
+base: core18
+
+apps:
+  bash:
+    command: bash -c
+    slots:
+      - mir
+      - wayland
+    plugs:
+      - opengl
+    environment:
+      LC_ALL: C.UTF-8
+      XCURSOR_PATH:    $SNAP/icons
+      # XDG config
+      XDG_RUNTIME_DIR: $SNAP_DATA/.xdg_runtime_dir
+      XDG_CACHE_HOME:  $SNAP_USER_COMMON/.cache
+      XDG_CONFIG_HOME: $SNAP_DATA/.config
+      XKB_CONFIG_ROOT: $SNAP/usr/share/X11/xkb
+      XDG_CONFIG_DIRS: ${SNAP}/etc/xdg:$XDG_CONFIG_DIRS
+      XDG_DATA_DIRS: ${SNAP}/usr/share:$XDG_DATA_DIRS
+      XDG_DATA_HOME: ${SNAP}/usr/share
+      # Prep for Mir
+      MIR_CLIENT_PLATFORM_PATH: ${SNAP}/usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/mir/client-platform
+      MIR_SERVER_PLATFORM_PATH: ${SNAP}/usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/mir/server-platform
+      # Prep EGL
+      __EGL_VENDOR_LIBRARY_DIRS: $SNAP/etc/glvnd/egl_vendor.d:$SNAP/usr/share/glvnd/egl_vendor.d
+
+  basic-test:
+    command: mir_demo_server --test-client mir_demo_client_basic --test-timeout 1
+    slots:
+      - mir
+      - wayland
+    plugs:
+      - opengl
+    environment:
+      LC_ALL: C.UTF-8
+      XCURSOR_PATH:    $SNAP/icons
+      # XDG config
+      XDG_RUNTIME_DIR: $SNAP_DATA/.xdg_runtime_dir
+      XDG_CACHE_HOME:  $SNAP_USER_COMMON/.cache
+      XDG_CONFIG_HOME: $SNAP_DATA/.config
+      XKB_CONFIG_ROOT: $SNAP/usr/share/X11/xkb
+      XDG_CONFIG_DIRS: ${SNAP}/etc/xdg:$XDG_CONFIG_DIRS
+      XDG_DATA_DIRS: ${SNAP}/usr/share:$XDG_DATA_DIRS
+      XDG_DATA_HOME: ${SNAP}/usr/share
+      # Prep for Mir
+      MIR_CLIENT_PLATFORM_PATH: ${SNAP}/usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/mir/client-platform
+      MIR_SERVER_PLATFORM_PATH: ${SNAP}/usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/mir/server-platform
+      # Prep EGL
+      __EGL_VENDOR_LIBRARY_DIRS: $SNAP/etc/glvnd/egl_vendor.d:$SNAP/usr/share/glvnd/egl_vendor.d
+
+  smoke-test:
+    command: mir-smoke-test-runner
+    slots:
+      - mir
+      - wayland
+    plugs:
+      - opengl
+    environment:
+      LC_ALL: C.UTF-8
+      XCURSOR_PATH:    $SNAP/icons
+      # XDG config
+      XDG_RUNTIME_DIR: $SNAP_DATA/.xdg_runtime_dir
+      XDG_CACHE_HOME:  $SNAP_USER_COMMON/.cache
+      XDG_CONFIG_HOME: $SNAP_DATA/.config
+      XKB_CONFIG_ROOT: $SNAP/usr/share/X11/xkb
+      XDG_CONFIG_DIRS: ${SNAP}/etc/xdg:$XDG_CONFIG_DIRS
+      XDG_DATA_DIRS: ${SNAP}/usr/share:$XDG_DATA_DIRS
+      XDG_DATA_HOME: ${SNAP}/usr/share
+      # Prep for Mir
+      MIR_CLIENT_PLATFORM_PATH: ${SNAP}/usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/mir/client-platform
+      MIR_SERVER_PLATFORM_PATH: ${SNAP}/usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/mir/server-platform
+      # Prep EGL
+      __EGL_VENDOR_LIBRARY_DIRS: $SNAP/etc/glvnd/egl_vendor.d:$SNAP/usr/share/glvnd/egl_vendor.d
+
+  performance-tests:
+    command: mir_performance_tests
+    slots:
+      - mir
+      - wayland
+    plugs:
+      - opengl
+    environment:
+      LC_ALL: C.UTF-8
+      XCURSOR_PATH:    $SNAP/icons
+      # XDG config
+      XDG_RUNTIME_DIR: $SNAP_DATA/.xdg_runtime_dir
+      XDG_CACHE_HOME:  $SNAP_USER_COMMON/.cache
+      XDG_CONFIG_HOME: $SNAP_DATA/.config
+      XKB_CONFIG_ROOT: $SNAP/usr/share/X11/xkb
+      XDG_CONFIG_DIRS: ${SNAP}/etc/xdg:$XDG_CONFIG_DIRS
+      XDG_DATA_DIRS: ${SNAP}/usr/share:$XDG_DATA_DIRS
+      XDG_DATA_HOME: ${SNAP}/usr/share
+      # Prep for Mir
+      MIR_CLIENT_PLATFORM_PATH: ${SNAP}/usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/mir/client-platform
+      MIR_SERVER_PLATFORM_PATH: ${SNAP}/usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/mir/server-platform
+      # Prep EGL
+      __EGL_VENDOR_LIBRARY_DIRS: $SNAP/etc/glvnd/egl_vendor.d:$SNAP/usr/share/glvnd/egl_vendor.d
+      MIR_SERVER_CONSOLE_PROVIDER: vt
+      MIR_SERVER_VT: 6
+
+parts:
+  ppa-mir:
+    plugin: nil
+    override-pull: |
+      sudo apt --assume-yes install software-properties-common
+      sudo add-apt-repository -yu ppa:mir-team/dev
+      # We shouldn't need to install stuff here, but it seems to fix intermittent build failures
+      sudo apt --assume-yes install mir-test-tools mir-graphics-drivers-desktop
+      sudo apt clean
+      snapcraftctl pull
+
+  mir-test-tools:
+    after: [ppa-mir]
+    plugin: nil
+    stage-packages:
+    - fonts-freefont-ttf
+    - mir-graphics-drivers-desktop
+    - mir-test-tools
+    - mir-demos
+    - xmir
+    - xwayland
+    - glmark2-es2
+    - glmark2-data
+    - glmark2-es2-wayland
+
+  icons:
+    plugin: nil
+    stage-packages: [dmz-cursor-theme]
+    organize:
+      usr/share/icons/DMZ-White: icons/default
+    prime:
+     - icons/default
+
+  mesa:
+    plugin: nil
+    stage-packages:
+      - libgl1-mesa-dri

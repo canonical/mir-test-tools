@@ -1,0 +1,52 @@
+#!/bin/bash
+set -xe
+
+config_changes=0
+mir_demo_server_config="$SNAP_DATA/.config/mir/mir_demo_server.config"
+
+# Ensure we have a config file with the fixed options
+if [ ! -e "${mir_demo_server_config}" ]; then
+cat <<EOT > "${mir_demo_server_config}"
+vt=4
+console-provider=vt
+EOT
+let config_changes+=1
+fi
+
+# vt
+vt=$(snapctl get vt)
+if [ -n "${vt}" ]; then
+  if [ -n "${vt//[0-9]}" ] || [ ! -e "/dev/tty$vt" ]; then
+    echo "ERROR: '$vt' is not a valid VT"
+    exit 1
+  fi
+
+  if [ "vt=${vt}" != "$(grep vt= ${mir_demo_server_config})" ]; then
+    if [ $config_changes -gt 0 ]; then
+      sed --in-place       '/^vt/d' ${mir_demo_server_config}
+    else
+      sed --in-place=.save '/^vt/d' ${mir_demo_server_config}
+    fi
+    echo vt=${vt} >> ${mir_demo_server_config}
+    let config_changes+=1
+  fi
+fi
+
+# console-provider
+console_provider=$(snapctl get console-provider)
+if [ -n "${console_provider}" ]; then
+  if [[ ! "${console_provider}" =~ ^(auto|logind|vt|none)$ ]]; then
+    echo "ERROR: '$console_provider' is not a valid console-provider option (auto|logind|vt|none)"
+    exit 1
+  fi
+
+  if [ "console-provider=${console_provider}" != "$(grep console-provider= $SNAP_DATA/mir-demo-server.config)" ]; then
+    if [ $config_changes -gt 0 ]; then
+      sed --in-place       '/^console-provider/d' ${mir_demo_server_config}
+    else
+      sed --in-place=.save '/^console-provider/d' ${mir_demo_server_config}
+    fi
+    echo console-provider=${console_provider} >> ${mir_demo_server_config}
+    let config_changes+=1
+  fi
+fi
