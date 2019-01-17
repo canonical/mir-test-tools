@@ -57,7 +57,31 @@ apps:
       # Prep EGL
       __EGL_VENDOR_LIBRARY_DIRS: $SNAP/etc/glvnd/egl_vendor.d:$SNAP/usr/share/glvnd/egl_vendor.d
 
-# *** These don't work very well ***
+  stress-test:
+    command: mir_demo_server --test-client mir_stress --test-timeout 610
+    slots:
+      - mir
+      - wayland
+    plugs:
+      - opengl
+    environment:
+      LC_ALL: C.UTF-8
+      XCURSOR_PATH:    $SNAP/icons
+      # XDG config
+      XDG_RUNTIME_DIR: $SNAP_DATA/.xdg_runtime_dir
+      XDG_CACHE_HOME:  $SNAP_USER_COMMON/.cache
+      XDG_CONFIG_HOME: $SNAP_DATA/.config
+      XKB_CONFIG_ROOT: $SNAP/usr/share/X11/xkb
+      XDG_CONFIG_DIRS: ${SNAP}/etc/xdg:$XDG_CONFIG_DIRS
+      XDG_DATA_DIRS: ${SNAP}/usr/share:$XDG_DATA_DIRS
+      XDG_DATA_HOME: ${SNAP}/usr/share
+      # Prep for Mir
+      MIR_CLIENT_PLATFORM_PATH: ${SNAP}/usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/mir/client-platform
+      MIR_SERVER_PLATFORM_PATH: ${SNAP}/usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/mir/server-platform
+      # Prep EGL
+      __EGL_VENDOR_LIBRARY_DIRS: $SNAP/etc/glvnd/egl_vendor.d:$SNAP/usr/share/glvnd/egl_vendor.d
+
+  # *** These don't work very well ***
 #  performance-tests:
 #    command: mir_performance_tests --gtest_filter=-GLMark* # glmark seems to hard-code it's data path
 #    slots:
@@ -89,33 +113,6 @@ apps:
     command: ls
     daemon: simple
     restart-condition: never
-
-  # For comparison
-  miral-kiosk:
-    command: usr/bin/miral-kiosk
-    daemon: simple
-    restart-condition: never
-    slots:
-      - mir
-      - wayland
-    plugs:
-      - opengl
-    environment:
-      LC_ALL: C.UTF-8
-      XCURSOR_PATH:    $SNAP/icons
-      # XDG config
-      XDG_RUNTIME_DIR: $SNAP_DATA/.xdg_runtime_dir
-      XDG_CACHE_HOME:  $SNAP_USER_COMMON/.cache
-      XDG_CONFIG_HOME: $SNAP_DATA/.config
-      XKB_CONFIG_ROOT: $SNAP/usr/share/X11/xkb
-      XDG_CONFIG_DIRS: ${SNAP}/etc/xdg:$XDG_CONFIG_DIRS
-      XDG_DATA_DIRS: ${SNAP}/usr/share:$XDG_DATA_DIRS
-      XDG_DATA_HOME: ${SNAP}/usr/share
-      # Prep for Mir
-      MIR_CLIENT_PLATFORM_PATH: ${SNAP}/usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/mir/client-platform
-      MIR_SERVER_PLATFORM_PATH: ${SNAP}/usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/mir/server-platform
-      # Prep EGL
-      __EGL_VENDOR_LIBRARY_DIRS: $SNAP/etc/glvnd/egl_vendor.d:$SNAP/usr/share/glvnd/egl_vendor.d
 
   # For experimenting
   bash:
