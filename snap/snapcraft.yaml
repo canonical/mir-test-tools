@@ -5,7 +5,7 @@ version-script: |
 summary: Mir test scripts and applications
 description: Mir test scripts and applications
 confinement: strict
-grade: devel
+grade: stable
 base: core18
 
 apps:
