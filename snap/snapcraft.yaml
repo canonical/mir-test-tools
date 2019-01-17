@@ -108,6 +108,12 @@ apps:
 #      # Prep EGL
 #      __EGL_VENDOR_LIBRARY_DIRS: $SNAP/etc/glvnd/egl_vendor.d:$SNAP/usr/share/glvnd/egl_vendor.d
 
+  # I don't know why, but having this here makes things work
+  dummy:
+    command: ls
+    daemon: simple
+    restart-condition: never
+
 parts:
   ppa-mir:
     plugin: nil
