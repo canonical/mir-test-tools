@@ -147,7 +147,7 @@ parts:
     plugin: nil
     override-pull: |
       sudo apt --assume-yes install software-properties-common
-      sudo add-apt-repository -yu ppa:mir-team/dev
+      sudo add-apt-repository -yu ppa:mir-team/release
       # We shouldn't need to install stuff here, but it seems to fix intermittent build failures
       sudo apt --assume-yes install mir-test-tools mir-graphics-drivers-desktop
       sudo apt clean
