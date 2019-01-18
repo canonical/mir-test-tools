@@ -10,7 +10,11 @@ cat <<EOT > "${mir_demo_server_config}"
 vt=4
 console-provider=vt
 EOT
-let config_changes+=1
+  # Hack to workaround issue #704
+  if [[ $(uname -r) =~ ^.*raspi2$ ]]; then
+    echo env-hacks=MIR_MESA_KMS_DISABLE_MODESET_PROBE >> "${mir_demo_server_config}"
+  fi
+  let config_changes+=1
 fi
 
 # vt
