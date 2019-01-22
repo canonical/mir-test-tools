@@ -9,6 +9,7 @@ if [ ! -e "${mir_demo_server_config}" ]; then
 cat <<EOT > "${mir_demo_server_config}"
 vt=4
 console-provider=vt
+wallpaper-font=$(dirname ${SNAP})/current/usr/share/fonts/truetype/freefont/FreeSansBold.ttf
 EOT
   # Hack to workaround issue #704
   if [[ $(uname -r) =~ ^.*raspi2$ ]]; then
