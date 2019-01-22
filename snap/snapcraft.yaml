@@ -58,7 +58,7 @@ apps:
       __EGL_VENDOR_LIBRARY_DIRS: $SNAP/etc/glvnd/egl_vendor.d:$SNAP/usr/share/glvnd/egl_vendor.d
 
   stress-test:
-    command: mir_demo_server --test-client mir_stress --test-timeout 630
+    command: mir_demo_server --test-client mir_stress
     slots:
       - mir
       - wayland
@@ -116,7 +116,7 @@ apps:
 
   # For experimenting
   bash:
-    command: bash -c
+    command: bash
     slots:
       - mir
       - wayland
