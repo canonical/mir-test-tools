@@ -269,6 +269,7 @@ parts:
     stage-packages:
       - qmlscene
       - qtwayland5
+      - qml-module-qtquick2
     organize:
       spinning-rect.qml: qml/spinning-rect.qml
       spinning-rect.sh: qml/spinning-rect.sh
