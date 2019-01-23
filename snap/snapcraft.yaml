@@ -113,6 +113,7 @@ apps:
       # SDL config
       PATH: $SNAP/bin/:$SNAP/usr/bin/:${SNAP}/usr/games:${PATH}
       LD_LIBRARY_PATH: ${LD_LIBRARY_PATH}:${SNAP}/usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/pulseaudio
+      NEVERBALL_DATA: $SNAP/usr/share/games/neverball/
 
   # Qt example
   qt-test:
@@ -212,6 +213,7 @@ apps:
       # neverputt
       PATH: $SNAP/bin/:$SNAP/usr/bin/:${SNAP}/usr/games:${PATH}
       LD_LIBRARY_PATH: ${LD_LIBRARY_PATH}:${SNAP}/usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/pulseaudio
+      NEVERBALL_DATA: $SNAP/usr/share/games/neverball/
 
 parts:
   ppa-mir:
