@@ -83,6 +83,17 @@ apps:
       QT_QPA_PLATFORM_PLUGIN_PATH: ${SNAP}/usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/qt5/plugins/platforms/
       QML2_IMPORT_PATH: ${SNAP}/usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/qt5/qml
 
+  # GTK3+ example
+  gtk3-test:
+    command: mir_demo_server --test-client $SNAP/gtkapp.sh
+    slots:
+      - mir
+      - wayland
+    plugs:
+      - opengl
+    environment:
+      PATH: $SNAP/bin/:$SNAP/usr/bin/:${SNAP}/usr/games:${PATH}
+
 #  # *** These don't work very well ***
 #  performance-test:
 #    command: mir_performance_tests --gtest_filter=-GLMark* # glmark seems to hard-code it's data path
@@ -138,6 +149,25 @@ apps:
       PATH: $SNAP/bin/:$SNAP/usr/bin/:${SNAP}/usr/games:${PATH}
       LD_LIBRARY_PATH: ${LD_LIBRARY_PATH}:${SNAP}/usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/pulseaudio
       NEVERBALL_DATA: $SNAP/usr/share/games/neverball/
+
+# For GTK3+
+plugs:
+  gnome-3-28-1804:
+    interface: content
+    target: $SNAP/gnome-platform
+    default-provider: gnome-3-28-1804
+  gtk-3-themes:
+    interface: content
+    target: $SNAP/data-dir/themes
+    default-provider: gtk-common-themes
+  icon-themes:
+    interface: content
+    target: $SNAP/data-dir/icons
+    default-provider: gtk-common-themes
+  sound-themes:
+    interface: content
+    target: $SNAP/data-dir/sounds
+    default-provider: gtk-common-themes
 
 parts:
   ppa-mir:
@@ -197,3 +227,28 @@ parts:
     organize:
       spinning-rect.qml: qml/spinning-rect.qml
       spinning-rect.sh: qml/spinning-rect.sh
+
+  desktop-gnome-platform:
+    source: https://github.com/ubuntu/snapcraft-desktop-helpers.git
+    source-subdir: gtk
+    plugin: make
+    make-parameters: ["FLAVOR=gtk3"]
+    build-packages:
+      - build-essential
+      - libgtk-3-dev
+    override-build: |
+      snapcraftctl build
+      mkdir -pv $SNAPCRAFT_PART_INSTALL/gnome-platform
+
+  gtk3-apps:
+    plugin: nil
+    stage-packages:
+      - gnome-chess
+      - gnuchess
+      - gnuchess-book
+
+  gtk3app:
+    plugin: dump
+    source: gtk3
+    organize:
+      gtk3app.sh: gtk3/gtk3app.sh
