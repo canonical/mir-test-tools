@@ -152,10 +152,6 @@ apps:
 
 # For GTK3+
 plugs:
-  gnome-3-28-1804:
-    interface: content
-    target: $SNAP/gnome-platform
-    default-provider: gnome-3-28-1804
   gtk-3-themes:
     interface: content
     target: $SNAP/data-dir/themes
@@ -228,7 +224,7 @@ parts:
       spinning-rect.qml: qml/spinning-rect.qml
       spinning-rect.sh: qml/spinning-rect.sh
 
-  desktop-gnome-platform:
+  snapcraft-desktop-helpers:
     source: https://github.com/ubuntu/snapcraft-desktop-helpers.git
     source-subdir: gtk
     plugin: make
@@ -236,9 +232,6 @@ parts:
     build-packages:
       - build-essential
       - libgtk-3-dev
-    override-build: |
-      snapcraftctl build
-      mkdir -pv $SNAPCRAFT_PART_INSTALL/gnome-platform
 
   gtk3-apps:
     plugin: nil
