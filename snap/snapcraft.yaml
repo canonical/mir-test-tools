@@ -14,7 +14,7 @@ environment:
   # XDG config
   XDG_RUNTIME_DIR: $SNAP_DATA/.xdg_runtime_dir
   XDG_CACHE_HOME:  $SNAP_USER_COMMON/.cache
-  XDG_CONFIG_HOME: $SNAP_DATA/.config
+  XDG_CONFIG_HOME: $SNAP_USER_DATA/.config
   XKB_CONFIG_ROOT: $SNAP/usr/share/X11/xkb
   XDG_CONFIG_DIRS: ${SNAP}/etc/xdg:$XDG_CONFIG_DIRS
   XDG_DATA_DIRS: ${SNAP}/usr/share:$XDG_DATA_DIRS

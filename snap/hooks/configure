@@ -2,7 +2,7 @@
 set -xe
 
 config_changes=0
-mir_demo_server_config="${SNAP_DATA}/.config/mir/mir_demo_server.config"
+mir_demo_server_config="${XDG_CONFIG_HOME}/mir/mir_demo_server.config"
 
 # Ensure we have a config file with the fixed options
 if [ ! -e "${mir_demo_server_config}" ]; then
