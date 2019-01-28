@@ -6,6 +6,7 @@ mir_demo_server_config="${XDG_CONFIG_HOME}/mir/mir_demo_server.config"
 
 # Ensure we have a config file with the fixed options
 if [ ! -e "${mir_demo_server_config}" ]; then
+mkdir -p $(dirname "${mir_demo_server_config}")
 cat <<EOT > "${mir_demo_server_config}"
 vt=4
 console-provider=vt
