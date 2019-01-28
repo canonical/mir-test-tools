@@ -236,9 +236,7 @@ parts:
   gtk3-apps:
     plugin: nil
     stage-packages:
-      - gnome-chess
-      - gnuchess
-      - gnuchess-book
+      - gnome-sudoku
 
   gtk3app:
     plugin: dump
