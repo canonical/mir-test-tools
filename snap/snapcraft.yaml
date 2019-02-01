@@ -1,7 +1,5 @@
 name: mir-test-tools
-version: Mir
-version-script: |
-  LANG=C apt-cache policy mir-test-tools | sed -rne 's/^\s+Candidate:\s+([^-]*)-.+$/\1/p'
+adopt-info: mir-test-tools
 summary: Mir test scripts and applications
 description: Mir test scripts and applications
 confinement: strict
@@ -179,6 +177,9 @@ parts:
   mir-test-tools:
     after: [ppa-mir]
     plugin: nil
+    override-pull: |
+      snapcraftctl pull
+      snapcraftctl set-version $(LANG=C apt-cache policy mir-test-tools | sed -rne 's/^\s+Candidate:\s+([^-]*)-.+$/\1/p')
     stage-packages:
     - fonts-freefont-ttf
     - mir-graphics-drivers-desktop
