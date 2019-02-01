@@ -1,6 +1,6 @@
 #!/bin/bash
 
-exec desktop-launch gnome-sudoku&
+gnome-sudoku&
 pid=$!
 trap 'kill -s SIGTERM $pid && exit 0' SIGTERM
 wait $pid

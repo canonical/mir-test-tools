@@ -9,14 +9,9 @@ base: core18
 environment:
   LC_ALL: C.UTF-8
   XCURSOR_PATH:    $SNAP/icons
-  # XDG config
+#  # XDG config
   XDG_RUNTIME_DIR: $SNAP_DATA/.xdg_runtime_dir
-  XDG_CACHE_HOME:  $SNAP_USER_COMMON/.cache
   XDG_CONFIG_HOME: $SNAP_USER_DATA/.config
-  XKB_CONFIG_ROOT: $SNAP/usr/share/X11/xkb
-  XDG_CONFIG_DIRS: ${SNAP}/etc/xdg:$XDG_CONFIG_DIRS
-  XDG_DATA_DIRS: ${SNAP}/usr/share:$XDG_DATA_DIRS
-  XDG_DATA_HOME: ${SNAP}/usr/share
   # Prep for Mir
   MIR_CLIENT_PLATFORM_PATH: ${SNAP}/usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/mir/client-platform
   MIR_SERVER_PLATFORM_PATH: ${SNAP}/usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/mir/server-platform
@@ -25,7 +20,7 @@ environment:
 
 apps:
   basic-test:
-    command: mir_demo_server --test-client mir_demo_client_basic --test-timeout 1
+    command: desktop-launch mir_demo_server --test-client mir_demo_client_basic --test-timeout 1
     slots:
       - mir
       - wayland
@@ -33,7 +28,7 @@ apps:
       - opengl
 
   smoke-test:
-    command: mir-smoke-test-runner
+    command: desktop-launch mir-smoke-test-runner
     slots:
       - mir
       - wayland
@@ -41,7 +36,7 @@ apps:
       - opengl
 
   stress-test:
-    command: mir_demo_server --test-client mir_stress
+    command: desktop-launch mir_demo_server --test-client mir_stress
     slots:
       - mir
       - wayland
@@ -50,7 +45,7 @@ apps:
 
   # SDL2 example
   sdl2-test:
-    command: mir_demo_server --test-client neverputt
+    command: desktop-launch mir_demo_server --test-client neverputt
     slots:
       - mir
       - wayland
@@ -69,7 +64,7 @@ apps:
 
   # Qt example
   qt-test:
-    command: mir_demo_server --test-client $SNAP/qml/spinning-rect.sh
+    command: desktop-launch mir_demo_server --test-client $SNAP/qml/spinning-rect.sh
     slots:
       - mir
       - wayland
@@ -83,7 +78,7 @@ apps:
 
   # GTK3+ example
   gtk3-test:
-    command: mir_demo_server --test-client $SNAP/gtkapp.sh
+    command: desktop-launch mir_demo_server --test-client $SNAP/gtkapp.sh
     slots:
       - mir
       - wayland
@@ -127,7 +122,7 @@ apps:
 
   # For experimenting
   bash:
-    command: bash
+    command: desktop-launch bash
     slots:
       - mir
       - wayland
@@ -139,10 +134,6 @@ apps:
       QT_PLUGIN_PATH: ${SNAP}/usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/qt5/plugins/
       QT_QPA_PLATFORM_PLUGIN_PATH: ${SNAP}/usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/qt5/plugins/platforms/
       QML2_IMPORT_PATH: ${SNAP}/usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/qt5/qml
-      # Alsa config
-      ALSA_CONFIG_DIR: $SNAP/usr/share/alsa
-      ALSA_CONFIG_PATH: ${SNAP}/usr/share/alsa
-      ALSA_MIXER_SIMPLE: ${SNAP}/usr/share/alsa
       # neverputt
       PATH: $SNAP/bin/:$SNAP/usr/bin/:${SNAP}/usr/games:${PATH}
       LD_LIBRARY_PATH: ${LD_LIBRARY_PATH}:${SNAP}/usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/pulseaudio
