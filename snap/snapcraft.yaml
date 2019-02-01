@@ -224,6 +224,10 @@ parts:
     build-packages:
       - build-essential
       - libgtk-3-dev
+    override-build: |
+      snapcraftctl build
+      # desktop-launch doesn't handle running without a user session very well, this avoids slow startup here
+      sed --in-place s'/^  needs_update=true/:/' $HOME/parts/snapcraft-desktop-helpers/install/bin/desktop-launch
 
   gtk3-apps:
     plugin: nil
