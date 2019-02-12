@@ -87,18 +87,17 @@ apps:
     environment:
       PATH: $SNAP/bin/:$SNAP/usr/bin/:${SNAP}/usr/games:${PATH}
 
-# Restore this and layout when we have snapcraft 3
-#  performance-test:
-#    # Xwayland . . : fails to create an X11 socket inside the snap
-#    # ClientLatency: uses a console-services stub that conflicts with MIR_SERVER_CONSOLE_PROVIDER
-#    command: bash -c "MIR_SERVER_VT=$(snapctl get vt) desktop-launch mir_performance_tests --gtest_filter=-GLMark2Xwayland*:ClientLatency*"
-#    slots:
-#      - mir
-#      - wayland
-#    plugs:
-#      - opengl
-#    environment:
-#      MIR_SERVER_CONSOLE_PROVIDER: vt
+  performance-test:
+    # Xwayland . . : fails to create an X11 socket inside the snap
+    # ClientLatency: uses a console-services stub that conflicts with MIR_SERVER_CONSOLE_PROVIDER
+    command: bash -c "MIR_SERVER_VT=$(snapctl get vt) desktop-launch mir_performance_tests --gtest_filter=-GLMark2Xwayland*:ClientLatency*"
+    slots:
+      - mir
+      - wayland
+    plugs:
+      - opengl
+    environment:
+      MIR_SERVER_CONSOLE_PROVIDER: vt
 
   # I don't know why, but having this here makes things work
   dummy:
@@ -140,10 +139,10 @@ plugs:
     target: $SNAP/data-dir/sounds
     default-provider: gtk-common-themes
 
-# Restore this and performance-test when we have snapcraft 3
-#layout:
-#  /usr/share/glmark2:
-#    bind: $SNAP/usr/share/glmark2
+passthrough:
+  layout:
+    /usr/share/glmark2:
+      bind: $SNAP/usr/share/glmark2
 
 parts:
   ppa-mir:
