@@ -87,32 +87,17 @@ apps:
     environment:
       PATH: $SNAP/bin/:$SNAP/usr/bin/:${SNAP}/usr/games:${PATH}
 
-#  # *** These don't work very well ***
-#  performance-test:
-#    command: mir_performance_tests --gtest_filter=-GLMark* # glmark seems to hard-code it's data path
-#    slots:
-#      - mir
-#      - wayland
-#    plugs:
-#      - opengl
-#    environment:
-#      LC_ALL: C.UTF-8
-#      XCURSOR_PATH:    $SNAP/icons
-#      # XDG config
-#      XDG_RUNTIME_DIR: $SNAP_DATA/.xdg_runtime_dir
-#      XDG_CACHE_HOME:  $SNAP_USER_COMMON/.cache
-#      XDG_CONFIG_HOME: $SNAP_DATA/.config
-#      XKB_CONFIG_ROOT: $SNAP/usr/share/X11/xkb
-#      XDG_CONFIG_DIRS: ${SNAP}/etc/xdg:$XDG_CONFIG_DIRS
-#      XDG_DATA_DIRS: ${SNAP}/usr/share:$XDG_DATA_DIRS
-#      XDG_DATA_HOME: ${SNAP}/usr/share
-#      # Prep for Mir
-#      MIR_CLIENT_PLATFORM_PATH: ${SNAP}/usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/mir/client-platform
-#      MIR_SERVER_PLATFORM_PATH: ${SNAP}/usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/mir/server-platform
-#      MIR_SERVER_CONSOLE_PROVIDER: vt
-#      MIR_SERVER_VT: 6
-#      # Prep EGL
-#      __EGL_VENDOR_LIBRARY_DIRS: $SNAP/etc/glvnd/egl_vendor.d:$SNAP/usr/share/glvnd/egl_vendor.d
+  performance-test:
+    # Xwayland . . : fails to create an X11 socket inside the snap
+    # ClientLatency: uses a console-services stub that conflicts with MIR_SERVER_CONSOLE_PROVIDER
+    command: bash -c "MIR_SERVER_VT=$(snapctl get vt) desktop-launch mir_performance_tests --gtest_filter=-GLMark2Xwayland*:ClientLatency*"
+    slots:
+      - mir
+      - wayland
+    plugs:
+      - opengl
+    environment:
+      MIR_SERVER_CONSOLE_PROVIDER: vt
 
   # I don't know why, but having this here makes things work
   dummy:
@@ -154,6 +139,10 @@ plugs:
     target: $SNAP/data-dir/sounds
     default-provider: gtk-common-themes
 
+layout:
+  /usr/share/glmark2:
+    bind: $SNAP/usr/share/glmark2
+
 parts:
   ppa-mir:
     plugin: nil
@@ -175,8 +164,6 @@ parts:
     - fonts-freefont-ttf
     - mir-graphics-drivers-desktop
     - mir-test-tools
-    - xmir
-    - xwayland
     - glmark2-es2
     - glmark2-data
     - glmark2-es2-wayland
