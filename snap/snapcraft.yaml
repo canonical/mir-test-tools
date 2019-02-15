@@ -90,14 +90,12 @@ apps:
   performance-test:
     # Xwayland . . : fails to create an X11 socket inside the snap
     # ClientLatency: uses a console-services stub that conflicts with MIR_SERVER_CONSOLE_PROVIDER
-    command: bash -c "MIR_SERVER_VT=$(snapctl get vt) desktop-launch mir_performance_tests --gtest_filter=-GLMark2Xwayland*:ClientLatency*"
+    command: performance-env.sh desktop-launch mir_performance_tests --gtest_filter=-GLMark2Xwayland*:ClientLatency*
     slots:
       - mir
       - wayland
     plugs:
       - opengl
-    environment:
-      MIR_SERVER_CONSOLE_PROVIDER: vt
 
   # I don't know why, but having this here makes things work
   dummy:
@@ -225,5 +223,9 @@ parts:
   gtk3app:
     plugin: dump
     source: gtk3
+
+  performance:
+    plugin: dump
+    source: performance
     organize:
-      gtk3app.sh: gtk3/gtk3app.sh
+      performance-env.sh: bin/performance-env.sh
