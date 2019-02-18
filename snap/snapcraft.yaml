@@ -141,7 +141,7 @@ passthrough:
   layout:
     /usr/share:
       bind: $SNAP/usr/share
-  ttf:
+
 parts:
   ppa-mir:
     plugin: nil
