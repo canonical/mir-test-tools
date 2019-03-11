@@ -152,14 +152,26 @@ parts:
       sudo apt clean
       snapcraftctl pull
 
-  mir-test-tools:
+  recipe-version:
     after: [ppa-mir]
+    plugin: nil
+    source: .
+    source-type: git
+    override-pull: |
+      snapcraftctl pull
+      git rev-list --count HEAD > $SNAPCRAFT_PART_INSTALL/recipe-version
+    prime:
+      - recipe-version
+
+  mir-test-tools:
+    after: [ppa-mir, recipe-version]
     plugin: nil
     override-pull: |
       snapcraftctl pull
       mir_version=`LANG=C apt-cache policy mir-test-tools | sed -rne 's/^\s+Candidate:\s+([^-]*)-.+$/\1/p'`
+      recipe_version=`cat $SNAPCRAFT_STAGE/recipe-version`
+      snapcraftctl set-version $mir_version-snap$recipe_version
       if echo $mir_version | grep dev; then snapcraftctl set-grade devel; else snapcraftctl set-grade stable; fi
-      snapcraftctl set-version $mir_version
     stage-packages:
     - fonts-freefont-ttf
     - mir-graphics-drivers-desktop
