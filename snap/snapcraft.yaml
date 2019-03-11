@@ -3,7 +3,6 @@ adopt-info: mir-test-tools
 summary: Mir test scripts and applications
 description: Mir test scripts and applications
 confinement: strict
-grade: stable
 base: core18
 
 environment:
@@ -158,7 +157,9 @@ parts:
     plugin: nil
     override-pull: |
       snapcraftctl pull
-      snapcraftctl set-version $(LANG=C apt-cache policy mir-test-tools | sed -rne 's/^\s+Candidate:\s+([^-]*)-.+$/\1/p')
+      mir_version=`LANG=C apt-cache policy mir-test-tools | sed -rne 's/^\s+Candidate:\s+([^-]*)-.+$/\1/p'`
+      if echo $mir_version | grep dev; then snapcraftctl set-grade devel; else snapcraftctl set-grade stable; fi
+      snapcraftctl set-version $mir_version
     stage-packages:
     - fonts-freefont-ttf
     - mir-graphics-drivers-desktop
