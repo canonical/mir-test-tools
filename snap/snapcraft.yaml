@@ -19,41 +19,18 @@ environment:
 apps:
   basic-test:
     command: desktop-launch mir_demo_server --test-client mir_demo_client_basic --test-timeout 1
-    slots:
-      - mir
-      - wayland
-    plugs:
-      - opengl
-      - x11
 
   smoke-test:
     command: desktop-launch mir-smoke-test-runner
-    slots:
-      - mir
-      - wayland
-    plugs:
-      - opengl
-      - x11
 
   stress-test:
     command: desktop-launch mir_demo_server --test-client mir_stress
-    slots:
-      - mir
-      - wayland
-    plugs:
-      - opengl
-      - x11
 
   # SDL2 example
   sdl2-test:
     command: desktop-launch mir_demo_server --test-client neverputt
-    slots:
-      - mir
-      - wayland
     plugs:
-      - opengl
       - pulseaudio
-      - x11
     environment:
       # Alsa config
       ALSA_CONFIG_DIR: $SNAP/usr/share/alsa
@@ -67,12 +44,6 @@ apps:
   # Qt example
   qt-test:
     command: desktop-launch mir_demo_server --test-client $SNAP/qml/spinning-rect.sh
-    slots:
-      - mir
-      - wayland
-    plugs:
-      - opengl
-      - x11
     environment:
       # Prep for Qt wayland
       QT_PLUGIN_PATH: ${SNAP}/usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/qt5/plugins/
@@ -82,12 +53,6 @@ apps:
   # GTK3+ example
   gtk3-test:
     command: desktop-launch mir_demo_server --test-client $SNAP/gtkapp.sh
-    slots:
-      - mir
-      - wayland
-    plugs:
-      - opengl
-      - x11
     environment:
       PATH: $SNAP/bin/:$SNAP/usr/bin/:${SNAP}/usr/games:${PATH}
 
@@ -95,12 +60,6 @@ apps:
     # Xwayland . . : fails to create an X11 socket inside the snap
     # ClientLatency: uses a console-services stub that conflicts with MIR_SERVER_CONSOLE_PROVIDER
     command: performance-env.sh desktop-launch mir_performance_tests --gtest_filter=-GLMark2Xwayland*:ClientLatency*
-    slots:
-      - mir
-      - wayland
-    plugs:
-      - opengl
-      - x11
 
   # I don't know why, but having this here makes things work
   dummy:
@@ -111,13 +70,6 @@ apps:
   # For experimenting
   bash:
     command: desktop-launch bash
-    slots:
-      - mir
-      - wayland
-    plugs:
-      - opengl
-      - pulseaudio
-      - x11
     environment:
       # Prep for Qt wayland
       QT_PLUGIN_PATH: ${SNAP}/usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/qt5/plugins/
@@ -128,8 +80,11 @@ apps:
       LD_LIBRARY_PATH: ${LD_LIBRARY_PATH}:${SNAP}/usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/pulseaudio
       NEVERBALL_DATA: $SNAP/usr/share/games/neverball/
 
-# For GTK3+
 plugs:
+  # For Mir
+  opengl:
+  x11:
+  # For GTK3+
   gtk-3-themes:
     interface: content
     target: $SNAP/data-dir/themes
@@ -142,6 +97,10 @@ plugs:
     interface: content
     target: $SNAP/data-dir/sounds
     default-provider: gtk-common-themes
+
+slots:
+  mir:
+  wayland:
 
 passthrough:
   layout:
