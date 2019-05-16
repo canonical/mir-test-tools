@@ -18,17 +18,17 @@ environment:
 
 apps:
   basic-test:
-    command: desktop-launch mir_demo_server --test-client mir_demo_client_basic --test-timeout 1
+    command: wrapper mir_demo_server --test-client mir_demo_client_basic --test-timeout 1
 
   smoke-test:
-    command: desktop-launch mir-smoke-test-runner
+    command: wrapper mir-smoke-test-runner
 
   stress-test:
-    command: desktop-launch mir_demo_server --test-client mir_stress
+    command: wrapper mir_demo_server --test-client mir_stress
 
   # SDL2 example
   sdl2-test:
-    command: desktop-launch mir_demo_server --test-client neverputt
+    command: wrapper mir_demo_server --test-client neverputt
     plugs:
       - pulseaudio
     environment:
@@ -43,7 +43,7 @@ apps:
 
   # Qt example
   qt-test:
-    command: desktop-launch mir_demo_server --test-client $SNAP/qml/spinning-rect.sh
+    command: wrapper mir_demo_server --test-client $SNAP/qml/spinning-rect.sh
     environment:
       # Prep for Qt wayland
       QT_PLUGIN_PATH: ${SNAP}/usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/qt5/plugins/
@@ -52,14 +52,14 @@ apps:
 
   # GTK3+ example
   gtk3-test:
-    command: desktop-launch mir_demo_server --test-client $SNAP/gtkapp.sh
+    command: wrapper mir_demo_server --test-client $SNAP/gtkapp.sh
     environment:
       PATH: $SNAP/bin/:$SNAP/usr/bin/:${SNAP}/usr/games:${PATH}
 
   performance-test:
     # Xwayland . . : fails to create an X11 socket inside the snap
     # ClientLatency: uses a console-services stub that conflicts with MIR_SERVER_CONSOLE_PROVIDER
-    command: performance-env.sh desktop-launch mir_performance_tests --gtest_filter=-GLMark2Xwayland*:ClientLatency*
+    command: performance-env.sh wrapper mir_performance_tests --gtest_filter=-GLMark2Xwayland*:ClientLatency*
 
   # I don't know why, but having this here makes things work
   dummy:
@@ -69,7 +69,7 @@ apps:
 
   # For experimenting
   bash:
-    command: desktop-launch bash
+    command: wrapper bash
     environment:
       # Prep for Qt wayland
       QT_PLUGIN_PATH: ${SNAP}/usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/qt5/plugins/
@@ -84,6 +84,7 @@ plugs:
   # For Mir
   opengl:
   x11:
+  login-session-control:
   # For GTK3+
   gtk-3-themes:
     interface: content
@@ -199,3 +200,9 @@ parts:
     source: performance
     organize:
       performance-env.sh: bin/performance-env.sh
+
+  wrapper:
+    plugin: dump
+    source: wrapper
+    organize:
+      wrapper: bin/wrapper
