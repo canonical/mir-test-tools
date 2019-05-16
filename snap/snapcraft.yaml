@@ -9,7 +9,6 @@ environment:
   LC_ALL: C.UTF-8
   XCURSOR_PATH:    $SNAP/icons
 #  # XDG config
-  XDG_RUNTIME_DIR: $SNAP_DATA/.xdg_runtime_dir
   XDG_CONFIG_HOME: $SNAP_USER_DATA/.config
   # Prep for Mir
   MIR_CLIENT_PLATFORM_PATH: ${SNAP}/usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/mir/client-platform
@@ -25,6 +24,7 @@ apps:
       - wayland
     plugs:
       - opengl
+      - x11
 
   smoke-test:
     command: desktop-launch mir-smoke-test-runner
@@ -33,6 +33,7 @@ apps:
       - wayland
     plugs:
       - opengl
+      - x11
 
   stress-test:
     command: desktop-launch mir_demo_server --test-client mir_stress
@@ -41,6 +42,7 @@ apps:
       - wayland
     plugs:
       - opengl
+      - x11
 
   # SDL2 example
   sdl2-test:
@@ -51,6 +53,7 @@ apps:
     plugs:
       - opengl
       - pulseaudio
+      - x11
     environment:
       # Alsa config
       ALSA_CONFIG_DIR: $SNAP/usr/share/alsa
@@ -69,6 +72,7 @@ apps:
       - wayland
     plugs:
       - opengl
+      - x11
     environment:
       # Prep for Qt wayland
       QT_PLUGIN_PATH: ${SNAP}/usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/qt5/plugins/
@@ -83,6 +87,7 @@ apps:
       - wayland
     plugs:
       - opengl
+      - x11
     environment:
       PATH: $SNAP/bin/:$SNAP/usr/bin/:${SNAP}/usr/games:${PATH}
 
@@ -95,6 +100,7 @@ apps:
       - wayland
     plugs:
       - opengl
+      - x11
 
   # I don't know why, but having this here makes things work
   dummy:
@@ -111,6 +117,7 @@ apps:
     plugs:
       - opengl
       - pulseaudio
+      - x11
     environment:
       # Prep for Qt wayland
       QT_PLUGIN_PATH: ${SNAP}/usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/qt5/plugins/
