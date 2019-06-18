@@ -112,7 +112,6 @@ parts:
     plugin: nil
     override-pull: |
       sudo apt --assume-yes install software-properties-common
-      sudo add-apt-repository ppa:graphics-drivers/ppa
       sudo add-apt-repository -yu ppa:mir-team/rc
       snapcraftctl pull
 
@@ -137,8 +136,6 @@ parts:
     stage-packages:
     - fonts-freefont-ttf
     - mir-graphics-drivers-desktop
-    - mir-graphics-drivers-nvidia
-    - mir-platform-graphics-eglstream-kms16
     - mir-test-tools
     - glmark2-es2
     - glmark2-data
