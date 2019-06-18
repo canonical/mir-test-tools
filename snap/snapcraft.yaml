@@ -113,7 +113,7 @@ parts:
     override-pull: |
       sudo apt --assume-yes install software-properties-common
       sudo add-apt-repository ppa:graphics-drivers/ppa
-      sudo add-apt-repository -yu ppa:mir-team/dev
+      sudo add-apt-repository -yu ppa:mir-team/rc
       snapcraftctl pull
 
   recipe-version:
