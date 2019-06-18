@@ -112,6 +112,7 @@ parts:
     plugin: nil
     override-pull: |
       sudo apt --assume-yes install software-properties-common
+      sudo add-apt-repository ppa:graphics-drivers/ppa
       sudo add-apt-repository -yu ppa:mir-team/rc
       snapcraftctl pull
 
@@ -140,6 +141,9 @@ parts:
     - glmark2-es2
     - glmark2-data
     - glmark2-es2-wayland
+    - on amd64:
+      - mir-graphics-drivers-nvidia
+      - mir-platform-graphics-eglstream-kms16
 
   icons:
     plugin: nil
