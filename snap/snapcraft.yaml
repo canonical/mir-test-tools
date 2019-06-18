@@ -102,10 +102,9 @@ slots:
   mir:
   wayland:
 
-passthrough:
-  layout:
-    /usr/share:
-      bind: $SNAP/usr/share
+layout:
+  /usr/share:
+    bind: $SNAP/usr/share
 
 parts:
   ppa-mir:
