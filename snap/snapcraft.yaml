@@ -19,12 +19,16 @@ environment:
 apps:
   basic-test:
     command: desktop-launch mir_demo_server --test-client mir_demo_client_basic --test-timeout 1
+    environment:
+      MIR_SERVER_ENABLE_MIRCLIENT: "on"
 
   smoke-test:
     command: desktop-launch mir-smoke-test-runner
 
   stress-test:
     command: desktop-launch mir_demo_server --test-client mir_stress
+    environment:
+      MIR_SERVER_ENABLE_MIRCLIENT: "on"
 
   # SDL2 example
   sdl2-test:
@@ -60,6 +64,8 @@ apps:
     # Xwayland . . : fails to create an X11 socket inside the snap
     # ClientLatency: uses a console-services stub that conflicts with MIR_SERVER_CONSOLE_PROVIDER
     command: performance-env.sh desktop-launch mir_performance_tests --gtest_filter=-GLMark2Xwayland*:ClientLatency*
+    environment:
+      MIR_SERVER_ENABLE_MIRCLIENT: "on"
 
   # I don't know why, but having this here makes things work
   dummy:
