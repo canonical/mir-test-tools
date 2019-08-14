@@ -1,0 +1,10 @@
+#!/bin/bash
+set -e
+
+if [ $(id -u) == 0 ] || [ -v DISPLAY ] || [ -e $SNAP_COMMON/login-session-control.connected ]; then
+  exec desktop-launch $@
+else
+  echo "ERROR: You need one of: root, a DISPLAY, or to connect the login-session-control interface."
+  echo "e.g. sudo snap connect" $SNAP_NAME":login-session-control :login-session-control"
+  exit 1
+fi
