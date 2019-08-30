@@ -114,14 +114,6 @@ layout:
     bind: $SNAP/usr/share
 
 parts:
-  ppa-mir:
-    plugin: nil
-    override-pull: |
-      sudo apt --assume-yes install software-properties-common
-      sudo add-apt-repository ppa:graphics-drivers/ppa
-      sudo add-apt-repository -yu ppa:mir-team/rc
-      snapcraftctl pull
-
   recipe-version:
     plugin: nil
     source: .
@@ -132,8 +124,9 @@ parts:
       - -recipe-version
 
   mir-test-tools:
-    after: [ppa-mir, recipe-version]
-    plugin: nil
+    after: [recipe-version]
+    plugin: ppa
+    ppa: mir-team/rc graphics-drivers/ppa
     override-pull: |
       snapcraftctl pull
       mir_version=`LANG=C apt-cache policy mir-test-tools | sed -rne 's/^\s+Candidate:\s+([^-]*)-.+$/\1/p'`
