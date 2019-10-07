@@ -9,4 +9,4 @@ if [ ! -d "$SNAP_DATA/.cache" ]; then
    mkdir   $SNAP_DATA/.cache
 fi
 
-snapctl set vt=4 console-provider=vt
+snapctl set vt=5 console-provider=vt
