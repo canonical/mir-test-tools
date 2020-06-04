@@ -17,18 +17,8 @@ environment:
   __EGL_VENDOR_LIBRARY_DIRS: $SNAP/etc/glvnd/egl_vendor.d:$SNAP/usr/share/glvnd/egl_vendor.d
 
 apps:
-  basic-test:
-    command: wrapper mir_demo_server --test-client mir_demo_client_basic --test-timeout 1
-    environment:
-      MIR_SERVER_ENABLE_MIRCLIENT: "on"
-
   smoke-test:
     command: wrapper mir-smoke-test-runner
-
-  stress-test:
-    command: wrapper mir_demo_server --test-client mir_stress
-    environment:
-      MIR_SERVER_ENABLE_MIRCLIENT: "on"
 
   # SDL2 example
   sdl2-test:
@@ -61,11 +51,9 @@ apps:
       PATH: $SNAP/bin/:$SNAP/usr/bin/:${SNAP}/usr/games:${PATH}
 
   performance-test:
-    # Xwayland . . : fails to create an X11 socket inside the snap
-    # ClientLatency: uses a console-services stub that conflicts with MIR_SERVER_CONSOLE_PROVIDER
-    command: performance-env.sh wrapper mir_performance_tests --gtest_filter=-GLMark2Xwayland*:ClientLatency*
-    environment:
-      MIR_SERVER_ENABLE_MIRCLIENT: "on"
+    command: performance-env.sh wrapper mir_performance_tests
+    plugs:
+      - network-bind
 
   # I don't know why, but having this here makes things work
   dummy:
@@ -112,6 +100,8 @@ slots:
 layout:
   /usr/share:
     bind: $SNAP/usr/share
+  /usr/bin/Xwayland:
+    symlink: $SNAP/usr/bin/Xwayland
 
 parts:
   recipe-version:
@@ -126,7 +116,7 @@ parts:
   mir-test-tools:
     after: [recipe-version]
     plugin: ppa
-    ppa: [mir-team/rc, graphics-drivers/ppa]
+    ppa: [mir-team/dev, graphics-drivers/ppa]
     override-pull: |
       snapcraftctl pull
       mir_version=`LANG=C apt-cache policy mir-test-tools | sed -rne 's/^\s+Candidate:\s+([^-]*)-.+$/\1/p'`
@@ -208,3 +198,9 @@ parts:
     source: wrapper
     organize:
       wrapper: bin/wrapper
+
+  xwayland:
+    plugin: nil
+    stage-packages:
+      - xwayland
+      - libbz2-1.0
