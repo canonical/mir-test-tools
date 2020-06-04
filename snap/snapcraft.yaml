@@ -51,14 +51,6 @@ apps:
       PATH: $SNAP/bin/:$SNAP/usr/bin/:${SNAP}/usr/games:${PATH}
 
   performance-test:
-    # Xwayland . . : fails to create an X11 socket inside the snap
-    # ClientLatency: uses a console-services stub that conflicts with MIR_SERVER_CONSOLE_PROVIDER
-    command: performance-env.sh wrapper mir_performance_tests --gtest_filter=-GLMark2Xwayland*:ClientLatency*
-    environment:
-      MIR_SERVER_ENABLE_MIRCLIENT: "on"
-
-  # Version of performance tests to work with Mir master (and 2.x)
-  post-mir-1-performance-test:
     command: performance-env.sh wrapper mir_performance_tests
     plugs:
       - network-bind
