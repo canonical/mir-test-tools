@@ -57,6 +57,12 @@ apps:
     environment:
       MIR_SERVER_ENABLE_MIRCLIENT: "on"
 
+  # Version of performance tests to work with Mir master (and 2.x)
+  post-mir-1-performance-test:
+    command: performance-env.sh wrapper mir_performance_tests
+    plugs:
+      - network-bind
+
   # I don't know why, but having this here makes things work
   dummy:
     command: ls
@@ -102,6 +108,8 @@ slots:
 layout:
   /usr/share:
     bind: $SNAP/usr/share
+  /usr/bin/Xwayland:
+    symlink: $SNAP/usr/bin/Xwayland
 
 parts:
   recipe-version:
@@ -116,7 +124,7 @@ parts:
   mir-test-tools:
     after: [recipe-version]
     plugin: ppa
-    ppa: [mir-team/rc, graphics-drivers/ppa]
+    ppa: [mir-team/dev, graphics-drivers/ppa]
     override-pull: |
       snapcraftctl pull
       mir_version=`LANG=C apt-cache policy mir-test-tools | sed -rne 's/^\s+Candidate:\s+([^-]*)-.+$/\1/p'`
@@ -198,3 +206,9 @@ parts:
     source: wrapper
     organize:
       wrapper: bin/wrapper
+
+  xwayland:
+    plugin: nil
+    stage-packages:
+      - xwayland
+      - libbz2-1.0
