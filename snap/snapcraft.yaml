@@ -102,6 +102,8 @@ layout:
     bind: $SNAP/usr/share
   /usr/bin/Xwayland:
     symlink: $SNAP/usr/bin/Xwayland
+  /usr/bin/xkbcomp:
+    symlink: $SNAP/usr/bin/xkbcomp
 
 parts:
   recipe-version:
