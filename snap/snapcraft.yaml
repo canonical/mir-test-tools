@@ -55,12 +55,6 @@ apps:
     plugs:
       - network-bind
 
-  # I don't know why, but having this here makes things work
-  dummy:
-    command: ls
-    daemon: simple
-    restart-condition: never
-
   # For experimenting
   bash:
     command: wrapper bash
