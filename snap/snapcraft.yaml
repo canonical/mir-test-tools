@@ -94,7 +94,6 @@ plugs:
     default-provider: gtk-common-themes
 
 slots:
-  mir:
   wayland:
 
 layout:
