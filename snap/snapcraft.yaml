@@ -3,7 +3,7 @@ adopt-info: mir-test-tools
 summary: Mir test scripts and applications
 description: Mir test scripts and applications
 confinement: strict
-base: core18
+base: core20
 
 environment:
   LC_ALL: C.UTF-8
@@ -16,11 +16,11 @@ environment:
 
 apps:
   smoke-test:
-    command: wrapper mir-smoke-test-runner
+    command: bin/wrapper mir-smoke-test-runner
 
   # SDL2 example
   sdl2-test:
-    command: wrapper mir_demo_server --test-client neverputt
+    command: bin/wrapper mir_demo_server --test-client neverputt
     plugs:
       - pulseaudio
     environment:
@@ -35,7 +35,7 @@ apps:
 
   # Qt example
   qt-test:
-    command: wrapper mir_demo_server --test-client $SNAP/qml/spinning-rect.sh
+    command: bin/wrapper mir_demo_server --test-client $SNAP/qml/spinning-rect.sh
     environment:
       # Prep for Qt wayland
       QT_PLUGIN_PATH: ${SNAP}/usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/qt5/plugins/
@@ -44,18 +44,18 @@ apps:
 
   # GTK3+ example
   gtk3-test:
-    command: wrapper mir_demo_server --test-client $SNAP/gtkapp.sh
+    command: bin/wrapper mir_demo_server --test-client $SNAP/gtkapp.sh
     environment:
       PATH: $SNAP/bin/:$SNAP/usr/bin/:${SNAP}/usr/games:${PATH}
 
   performance-test:
-    command: performance-env.sh wrapper mir_performance_tests
+    command: bin/performance-env.sh wrapper mir_performance_tests
     plugs:
       - network-bind
 
   # For experimenting
   bash:
-    command: wrapper bash
+    command: bin/wrapper bash
     environment:
       # Prep for Qt wayland
       QT_PLUGIN_PATH: ${SNAP}/usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/qt5/plugins/
@@ -97,6 +97,14 @@ layout:
     symlink: $SNAP/usr/bin/xkbcomp
 
 parts:
+  ppa-setup:
+    plugin: nil
+    override-pull: |
+      sudo apt --assume-yes install software-properties-common
+      sudo add-apt-repository -yn ppa:mir-team/rc
+      sudo add-apt-repository -yu ppa:graphics-drivers/ppa
+      snapcraftctl pull
+
   recipe-version:
     plugin: nil
     source: .
@@ -107,9 +115,8 @@ parts:
       - -recipe-version
 
   mir-test-tools:
-    after: [recipe-version]
-    plugin: ppa
-    ppa: [mir-team/rc, graphics-drivers/ppa]
+    after: [ recipe-version, ppa-setup ]
+    plugin: nil
     override-pull: |
       snapcraftctl pull
       mir_version=`LANG=C apt-cache policy mir-test-tools | sed -rne 's/^\s+Candidate:\s+([^-]*)-.+$/\1/p'`
