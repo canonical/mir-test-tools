@@ -14,7 +14,7 @@ architectures:
 environment:
   LC_ALL: C.UTF-8
   XCURSOR_PATH: $SNAP/icons
-  #  # XDG config
+  # XDG config
   XDG_CONFIG_HOME: $SNAP_USER_DATA/.config
   # Prep for Mir
   MIR_CLIENT_PLATFORM_PATH: ${SNAP}/usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/mir/client-platform
