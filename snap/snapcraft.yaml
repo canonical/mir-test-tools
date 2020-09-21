@@ -193,6 +193,7 @@ parts:
 
   wrapper:
     plugin: dump
+    stage-packages: [bash]
     source: wrapper
     organize:
       wrapper: bin/wrapper
