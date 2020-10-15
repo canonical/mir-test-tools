@@ -1,12 +1,4 @@
 #!/bin/bash
-if [ $(id -u) == 0 ]; then
-  export MIR_SERVER_VT=$(snapctl get vt)
-  export MIR_SERVER_CONSOLE_PROVIDER=$(snapctl get console-provider)
-fi
-# Hack to workaround issue #704
-if [[ $(uname -r) =~ ^.*raspi2$ ]]; then
-  export MIR_MESA_KMS_DISABLE_MODESET_PROBE=on
-fi
 
 # For X11 we need .X11-unix/ in the snap's /tmp directory
 mkdir -p /tmp/.X11-unix

@@ -1,10 +1,28 @@
 #!/bin/bash
 set -e
 
-if [ $(id -u) == 0 ] || [ -v DISPLAY ] || snapctl is-connected login-session-control; then
-  exec desktop-launch $@
-else
+if [ $(id -u) != 0 ] && ! [ -v DISPLAY ] && ! snapctl is-connected login-session-control; then
   echo "ERROR: You need one of: root, a DISPLAY, or to connect the login-session-control interface."
   echo "e.g. sudo snap connect" $SNAP_NAME":login-session-control :login-session-control"
   exit 1
 fi
+
+if [ -v MIR_SERVER_WAYLAND_HOST ]; then
+  MIR_SERVER_CONSOLE_PROVIDER=${MIR_SERVER_CONSOLE_PROVIDER:-none}
+else
+  if [ $(id -u) != 0 ]; then
+    MIR_SERVER_CONSOLE_PROVIDER=${MIR_SERVER_CONSOLE_PROVIDER:-$(snapctl get console-provider)}
+  else
+    MIR_SERVER_CONSOLE_PROVIDER=${MIR_SERVER_CONSOLE_PROVIDER:-auto}
+  fi
+fi
+
+if [ "${MIR_SERVER_CONSOLE_PROVIDER}" = "vt" ]; then
+  MIR_SERVER_VT=${MIR_SERVER_VT:-$(snapctl get vt)}
+else
+  unset MIR_SERVER_VT
+fi
+
+unset WAYLAND_DISPLAY
+
+exec $@

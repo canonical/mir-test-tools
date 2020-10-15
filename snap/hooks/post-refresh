@@ -1,10 +1,10 @@
 #!/bin/bash
-set -x
 
-if [ ! -d "$SNAP_DATA/.xdg_runtime_dir" ]; then
-   mkdir   $SNAP_DATA/.xdg_runtime_dir
-fi
+mir_demo_server_config="${XDG_CONFIG_HOME}/mir/mir_demo_server.config"
 
-if [ ! -d "$SNAP_DATA/.cache" ]; then
-   mkdir   $SNAP_DATA/.cache
+# Drop console-provider and vt options from the config.
+# These are now handled via environment variables (see the wrapper script)
+if [ -e "${mir_demo_server_config}" ]; then
+  sed --in-place '/^vt=/d' ${mir_demo_server_config}
+  sed --in-place '/^console-provider=/d' ${mir_demo_server_config}
 fi

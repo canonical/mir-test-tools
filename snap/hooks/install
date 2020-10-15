@@ -1,12 +1,6 @@
 #!/bin/bash
 set -x
 
-if [ ! -d "$SNAP_DATA/.xdg_runtime_dir" ]; then
-   mkdir   $SNAP_DATA/.xdg_runtime_dir
-fi
-
-if [ ! -d "$SNAP_DATA/.cache" ]; then
-   mkdir   $SNAP_DATA/.cache
-fi
-
 snapctl set vt=5 console-provider=vt
+
+exec $(dirname "${BASH_SOURCE[0]}")/post-refresh
