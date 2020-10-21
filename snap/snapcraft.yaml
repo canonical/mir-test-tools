@@ -75,21 +75,6 @@ apps:
     plugs:
       - network-bind
 
-  # For experimenting
-  bash:
-    command-chain:
-      - bin/desktop-launch
-    command: bin/wrapper bash
-    environment:
-      # Prep for Qt wayland
-      QT_PLUGIN_PATH: ${SNAP}/usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/qt5/plugins/
-      QT_QPA_PLATFORM_PLUGIN_PATH: ${SNAP}/usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/qt5/plugins/platforms/
-      QML2_IMPORT_PATH: ${SNAP}/usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/qt5/qml
-      # neverputt
-      PATH: $SNAP/bin/:$SNAP/usr/bin/:${SNAP}/usr/games:${PATH}
-      LD_LIBRARY_PATH: ${LD_LIBRARY_PATH}:${SNAP}/usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/pulseaudio
-      NEVERBALL_DATA: $SNAP/usr/share/games/neverball/
-
 plugs:
   # For Mir
   opengl:
