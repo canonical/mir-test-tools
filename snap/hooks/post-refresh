@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# Remove legacy console-provider option
+snapctl set console-provider=null
+
 mir_demo_server_config="${XDG_CONFIG_HOME}/mir/mir_demo_server.config"
 
 # Drop console-provider and vt options from the config.

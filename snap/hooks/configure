@@ -28,11 +28,3 @@ if [ -n "${vt}" ]; then
   fi
 fi
 
-# console-provider
-console_provider=$(snapctl get console-provider)
-if [ -n "${console_provider}" ]; then
-  if [[ ! "${console_provider}" =~ ^(auto|logind|vt|none)$ ]]; then
-    echo "ERROR: '${console_provider}' is not a valid console-provider option (auto|logind|vt|none)"
-    exit 1
-  fi
-fi
