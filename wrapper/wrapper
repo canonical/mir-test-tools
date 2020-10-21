@@ -7,7 +7,7 @@ if [ $(id -u) != 0 ] && ! [ -v DISPLAY ] && ! snapctl is-connected login-session
   exit 1
 fi
 
-if [ -v MIR_SERVER_WAYLAND_HOST ]; then
+if [ -n "${MIR_SERVER_WAYLAND_HOST}" ]; then
   MIR_SERVER_CONSOLE_PROVIDER=${MIR_SERVER_CONSOLE_PROVIDER:-none}
 else
   if [ $(id -u) != 0 ]; then
