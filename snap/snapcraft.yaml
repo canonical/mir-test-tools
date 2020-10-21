@@ -110,8 +110,10 @@ parts:
     plugin: nil
     override-pull: |
       sudo apt --assume-yes install software-properties-common
-      sudo add-apt-repository -yn ppa:mir-team/release
-      sudo add-apt-repository -yu ppa:graphics-drivers/ppa
+      if [ $(arch) = "x86_64" ]; then
+        sudo add-apt-repository -yn ppa:graphics-drivers/ppa
+      fi
+      sudo add-apt-repository -yu ppa:mir-team/release
       snapcraftctl pull
 
   recipe-version:
