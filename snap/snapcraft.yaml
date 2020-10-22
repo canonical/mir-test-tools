@@ -22,11 +22,17 @@ environment:
 
 apps:
   smoke-test:
-    command: bin/wrapper mir-smoke-test-runner
+    command-chain:
+      - bin/desktop-launch
+      - bin/wrapper
+    command: usr/bin/mir-smoke-test-runner
 
   # SDL2 example
   sdl2-test:
-    command: bin/wrapper mir_demo_server --test-client neverputt
+    command-chain:
+      - bin/desktop-launch
+      - bin/wrapper
+    command: usr/bin/mir_demo_server --test-client neverputt
     plugs:
       - pulseaudio
     environment:
@@ -41,7 +47,10 @@ apps:
 
   # Qt example
   qt-test:
-    command: bin/wrapper mir_demo_server --test-client $SNAP/qml/spinning-rect.sh
+    command-chain:
+      - bin/desktop-launch
+      - bin/wrapper
+    command: usr/bin/mir_demo_server --test-client $SNAP/qml/spinning-rect.sh
     environment:
       # Prep for Qt wayland
       QT_PLUGIN_PATH: ${SNAP}/usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/qt5/plugins/
@@ -50,27 +59,21 @@ apps:
 
   # GTK3+ example
   gtk3-test:
-    command: bin/wrapper mir_demo_server --test-client $SNAP/gtkapp.sh
+    command-chain:
+      - bin/desktop-launch
+      - bin/wrapper
+    command: usr/bin/mir_demo_server --test-client $SNAP/gtkapp.sh
     environment:
       PATH: $SNAP/bin/:$SNAP/usr/bin/:${SNAP}/usr/games:${PATH}
 
   performance-test:
-    command: bin/performance-env.sh wrapper mir_performance_tests
+    command-chain:
+      - bin/performance-env.sh
+      - bin/desktop-launch
+      - bin/wrapper
+    command: usr/bin/mir_performance_tests
     plugs:
       - network-bind
-
-  # For experimenting
-  bash:
-    command: bin/wrapper bash
-    environment:
-      # Prep for Qt wayland
-      QT_PLUGIN_PATH: ${SNAP}/usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/qt5/plugins/
-      QT_QPA_PLATFORM_PLUGIN_PATH: ${SNAP}/usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/qt5/plugins/platforms/
-      QML2_IMPORT_PATH: ${SNAP}/usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/qt5/qml
-      # neverputt
-      PATH: $SNAP/bin/:$SNAP/usr/bin/:${SNAP}/usr/games:${PATH}
-      LD_LIBRARY_PATH: ${LD_LIBRARY_PATH}:${SNAP}/usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/pulseaudio
-      NEVERBALL_DATA: $SNAP/usr/share/games/neverball/
 
 plugs:
   # For Mir
@@ -107,8 +110,10 @@ parts:
     plugin: nil
     override-pull: |
       sudo apt --assume-yes install software-properties-common
-      sudo add-apt-repository -yn ppa:mir-team/release
-      sudo add-apt-repository -yu ppa:graphics-drivers/ppa
+      if [ $(arch) = "x86_64" ]; then
+        sudo add-apt-repository -yn ppa:graphics-drivers/ppa
+      fi
+      sudo add-apt-repository -yu ppa:mir-team/release
       snapcraftctl pull
 
   recipe-version:
