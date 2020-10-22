@@ -19,10 +19,12 @@ fi
 
 if [ "${MIR_SERVER_CONSOLE_PROVIDER}" = "vt" ]; then
   MIR_SERVER_VT=${MIR_SERVER_VT:-$(snapctl get vt)}
+  export MIR_SERVER_VT
 else
   unset MIR_SERVER_VT
 fi
 
+export MIR_SERVER_CONSOLE_PROVIDER
 unset WAYLAND_DISPLAY
 
 exec $@
