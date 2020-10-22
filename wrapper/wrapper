@@ -9,6 +9,13 @@ fi
 
 if [ -n "${MIR_SERVER_WAYLAND_HOST}" ]; then
   MIR_SERVER_CONSOLE_PROVIDER=${MIR_SERVER_CONSOLE_PROVIDER:-none}
+  host_wayland=$(dirname "${XDG_RUNTIME_DIR}")/${MIR_SERVER_WAYLAND_HOST}
+  if [ ! -O "${host_wayland}" ] || [ ! -O "${host_wayland}.lock" ]; then
+    echo "ERROR: MIR_SERVER_WAYLAND_HOST [${MIR_SERVER_WAYLAND_HOST}] not set up"
+    exit 1
+  fi
+  ln -sf "${host_wayland}" "$XDG_RUNTIME_DIR"
+  ln -sf "${host_wayland}.lock" "$XDG_RUNTIME_DIR"
 else
   if [ $(id -u) != 0 ]; then
     MIR_SERVER_CONSOLE_PROVIDER=${MIR_SERVER_CONSOLE_PROVIDER:-auto}
