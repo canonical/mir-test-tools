@@ -19,6 +19,10 @@ environment:
   # Prep for Mir
   MIR_CLIENT_PLATFORM_PATH: ${SNAP}/usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/mir/client-platform
   MIR_SERVER_PLATFORM_PATH: ${SNAP}/usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/mir/server-platform
+  # Setup EGL from the plugs
+  LD_LIBRARY_PATH: ${LD_LIBRARY_PATH:+$LD_LIBRARY_PATH:}:$SNAP/egl/lib:${SNAP}/usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/pulseaudio
+  LIBGL_DRIVERS_PATH: $SNAP/egl/dri
+  LIBVA_DRIVERS_PATH: $SNAP/egl/dri
 
 apps:
   smoke-test:
@@ -93,6 +97,10 @@ plugs:
     interface: content
     target: $SNAP/data-dir/sounds
     default-provider: gtk-common-themes
+  egl-core20:
+    interface: content
+    target: $SNAP/egl
+    default-provider: mesa-core20/edge
 
 slots:
   wayland:
@@ -134,6 +142,21 @@ parts:
       recipe_version=`cat $SNAPCRAFT_STAGE/recipe-version`
       snapcraftctl set-version $mir_version-snap$recipe_version
       if echo $mir_version | grep -e '+dev' -e '~rc' -q; then snapcraftctl set-grade devel; else snapcraftctl set-grade stable; fi
+    override-build: |
+      snapcraftctl build
+      rm -rf $SNAPCRAFT_PART_INSTALL/usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/dri
+      for file in \
+        libdrm_amdgpu.so*\
+        libdrm_intel.so*\
+        libdrm_nouveau.so*\
+        libdrm_radeon.so*\
+        libdrm.so.2*\
+        libglapi.so*\
+        libLLVM-11.so*\
+        libpciaccess.so*\
+        libsensors.so*\
+        libvulkan.so*
+      do rm -f $SNAPCRAFT_PART_INSTALL/usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/$file; done
     stage-packages:
     - fonts-freefont-ttf
     - mir-graphics-drivers-desktop
@@ -141,19 +164,29 @@ parts:
     - glmark2-es2
     - glmark2-data
     - glmark2-es2-wayland
-    - on amd64: [mir-graphics-drivers-nvidia]
+#    - on amd64: [mir-graphics-drivers-nvidia]
 
   icons:
     plugin: nil
     stage-packages: [dmz-cursor-theme]
 
-  mesa:
-    plugin: nil
-    stage-packages:
-      - libgl1-mesa-dri
-
   sdl2-apps:
     plugin: nil
+    override-build: |
+      snapcraftctl build
+      rm -rf $SNAPCRAFT_PART_INSTALL/usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/dri
+      for file in \
+        libdrm_amdgpu.so*\
+        libdrm_intel.so*\
+        libdrm_nouveau.so*\
+        libdrm_radeon.so*\
+        libdrm.so.2*\
+        libglapi.so*\
+        libLLVM-11.so*\
+        libpciaccess.so*\
+        libsensors.so*\
+        libvulkan.so*
+      do rm -f $SNAPCRAFT_PART_INSTALL/usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/$file; done
     stage-packages:
       - libsdl2-2.0-0
       - libsdl2-image-2.0-0
@@ -170,6 +203,21 @@ parts:
       - qmlscene
       - qtwayland5
       - qml-module-qtquick2
+    override-build: |
+      snapcraftctl build
+      rm -rf $SNAPCRAFT_PART_INSTALL/usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/dri
+      for file in \
+        libdrm_amdgpu.so*\
+        libdrm_intel.so*\
+        libdrm_nouveau.so*\
+        libdrm_radeon.so*\
+        libdrm.so.2*\
+        libglapi.so*\
+        libLLVM-11.so*\
+        libpciaccess.so*\
+        libsensors.so*\
+        libvulkan.so*
+      do rm -f $SNAPCRAFT_PART_INSTALL/usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/$file; done
     organize:
       spinning-rect.qml: qml/spinning-rect.qml
       spinning-rect.sh: qml/spinning-rect.sh
@@ -186,6 +234,8 @@ parts:
       snapcraftctl build
       # desktop-launch doesn't handle running without a user session very well, this avoids slow startup here
       sed --in-place s'/^  needs_update=true/:/' $SNAPCRAFT_PART_INSTALL/bin/desktop-launch
+      # desktop-launch is wrong about where LIBGL_DRIVERS_PATH and LIBVA_DRIVERS_PATH should point
+      sed --in-place s'/^export LIB/# export LIB/' $SNAPCRAFT_PART_INSTALL/bin/desktop-launch
 
   gtk3-apps:
     plugin: nil
@@ -210,6 +260,22 @@ parts:
 
   xwayland:
     plugin: nil
+    override-build: |
+      snapcraftctl build
+      rm -rf $SNAPCRAFT_PART_INSTALL/usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/dri
+      for file in \
+        libdrm_amdgpu.so*\
+        libdrm_intel.so*\
+        libdrm_nouveau.so*\
+        libdrm_radeon.so*\
+        libdrm.so.2*\
+        libglapi.so*\
+        libLLVM-11.so*\
+        libpciaccess.so*\
+        libsensors.so*\
+        libvulkan.so*
+      do rm -f $SNAPCRAFT_PART_INSTALL/usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/$file; done
+
     stage-packages:
       - xwayland
       - libbz2-1.0
