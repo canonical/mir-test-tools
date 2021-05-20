@@ -121,7 +121,7 @@ parts:
       if [ $(arch) = "x86_64" ]; then
         sudo add-apt-repository -yn ppa:graphics-drivers/ppa
       fi
-      sudo add-apt-repository -yu ppa:mir-team/release
+      sudo add-apt-repository -yu ppa:mir-team/dev
       snapcraftctl pull
 
   recipe-version:
