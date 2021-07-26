@@ -19,6 +19,9 @@ environment:
   # Prep for Mir
   MIR_CLIENT_PLATFORM_PATH: ${SNAP}/usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/mir/client-platform
   MIR_SERVER_PLATFORM_PATH: ${SNAP}/usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/mir/server-platform
+  LD_LIBRARY_PATH:    $SNAP/graphics/lib
+  LIBGL_DRIVERS_PATH: $SNAP/graphics/dri
+  LIBVA_DRIVERS_PATH: $SNAP/graphics/dri
 
 apps:
   smoke-test:
@@ -42,7 +45,6 @@ apps:
       ALSA_MIXER_SIMPLE: ${SNAP}/usr/share/alsa
       # SDL config
       PATH: $SNAP/bin/:$SNAP/usr/bin/:${SNAP}/usr/games:${PATH}
-      LD_LIBRARY_PATH: ${LD_LIBRARY_PATH}:${SNAP}/usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/pulseaudio
       NEVERBALL_DATA: $SNAP/usr/share/games/neverball/
 
   # Qt example
@@ -93,6 +95,10 @@ plugs:
     interface: content
     target: $SNAP/data-dir/sounds
     default-provider: gtk-common-themes
+  graphics-core20:
+    interface: content
+    target: $SNAP/graphics
+    default-provider: mesa-core20
 
 slots:
   wayland:
@@ -104,6 +110,8 @@ layout:
     symlink: $SNAP/usr/bin/Xwayland
   /usr/bin/xkbcomp:
     symlink: $SNAP/usr/bin/xkbcomp
+  /usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/pulseaudio:
+    bind: $SNAP/usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/pulseaudio
 
 parts:
   ppa-setup:
@@ -146,11 +154,6 @@ parts:
   icons:
     plugin: nil
     stage-packages: [dmz-cursor-theme]
-
-  mesa:
-    plugin: nil
-    stage-packages:
-      - libgl1-mesa-dri
 
   sdl2-apps:
     plugin: nil
@@ -213,3 +216,16 @@ parts:
     stage-packages:
       - xwayland
       - libbz2-1.0
+
+  cleanup:
+    after: [mir-test-tools, icons, sdl2-apps, qmldemo, snapcraft-desktop-helpers, gtk3-apps, gtk3app, performance, wrapper, xwayland]
+    plugin: nil
+    build-snaps: [ mesa-core20 ]
+    override-prime: |
+      set -eux
+      cd /snap/mesa-core20/current/egl/lib
+      find . -type f,l -exec rm -f $SNAPCRAFT_PRIME/usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/{} \;
+      rm -fr "$SNAPCRAFT_PRIME/usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/dri"
+      for CRUFT in bug lintian man; do
+        rm -rf "$SNAPCRAFT_PRIME/usr/share/$CRUFT"
+      done
