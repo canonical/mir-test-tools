@@ -33,5 +33,7 @@ fi
 
 export MIR_SERVER_CONSOLE_PROVIDER
 unset WAYLAND_DISPLAY
+export LIBGL_DRIVERS_PATH=$SNAP/graphics/dri
+export LIBVA_DRIVERS_PATH=$SNAP/graphics/dri
 
 exec $@
