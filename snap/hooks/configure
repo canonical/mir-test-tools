@@ -1,12 +1,15 @@
-#!/bin/bash
-set -xe
+#!/bin/sh
+set -e
+
+# Remove legacy console-provider option
+snapctl set console-provider=null
 
 mir_demo_server_config="${XDG_CONFIG_HOME}/mir/mir_demo_server.config"
 
 # Ensure we have a config file with the fixed options
 if [ ! -e "${mir_demo_server_config}" ]; then
-mkdir -p $(dirname "${mir_demo_server_config}")
-cat <<EOT > "${mir_demo_server_config}"
+  mkdir -p "$(dirname "${mir_demo_server_config}")"
+  cat <<EOT > "${mir_demo_server_config}"
 # This ensures the best possible diagnostics whenever we fail to start.
 env_hacks=MIR_MESA_KMS_DISABLE_MODESET_PROBE
 EOT
@@ -14,17 +17,11 @@ else
   # Drop console-provider and vt options from mir_demo_server.config.
   # These are now handled via environment variables (see the wrapper script)
   if [ -e "${mir_demo_server_config}" ]; then
-    sed --in-place '/^vt=/d' ${mir_demo_server_config}
-    sed --in-place '/^console-provider=/d' ${mir_demo_server_config}
+    sed --in-place '/^vt=/d' "${mir_demo_server_config}"
+    sed --in-place '/^console-provider=/d' "${mir_demo_server_config}"
   fi
 fi
 
 # vt
-vt=$(snapctl get vt)
-if [ -n "${vt}" ]; then
-  if [ -n "${vt//[0-9]}" ] || [ ! -e "/dev/tty$vt" ]; then
-    echo "ERROR: '${vt}' is not a valid VT"
-    exit 1
-  fi
-fi
+[ -z "$(snapctl get vt)" ] || snapctl set vt=5
 

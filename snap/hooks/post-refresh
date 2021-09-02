@@ -1,13 +1,1 @@
-#!/bin/bash
-
-# Remove legacy console-provider option
-snapctl set console-provider=null
-
-mir_demo_server_config="${XDG_CONFIG_HOME}/mir/mir_demo_server.config"
-
-# Drop console-provider and vt options from the config.
-# These are now handled via environment variables (see the wrapper script)
-if [ -e "${mir_demo_server_config}" ]; then
-  sed --in-place '/^vt=/d' ${mir_demo_server_config}
-  sed --in-place '/^console-provider=/d' ${mir_demo_server_config}
-fi
+install
