@@ -16,8 +16,8 @@ environment:
   XCURSOR_PATH: $SNAP/usr/share/icons
   # XDG config
   XDG_CONFIG_HOME: $SNAP_USER_DATA/.config
-  XDG_DATA_HOME:   $SNAP_DATA
-  XDG_DATA_DIRS:   $SNAP/usr/share
+  XDG_DATA_HOME:   $SNAP_USER_DATA
+  XDG_DATA_DIRS:   $SNAP/usr/share:$SNAP_DATA
   XDG_CONFIG_DIRS: $SNAP/etc/xdg
   XDG_CACHE_HOME:  $SNAP_USER_COMMON/.cache
   # Prep for Mir
