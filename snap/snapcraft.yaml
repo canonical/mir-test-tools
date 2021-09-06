@@ -27,10 +27,6 @@ environment:
   LIBGL_DRIVERS_PATH:        $SNAP/graphics/dri
   LIBVA_DRIVERS_PATH:        $SNAP/graphics/dri
   __EGL_VENDOR_LIBRARY_DIRS: $SNAP/graphics/glvnd/egl_vendor.d
-  # GDK pixbuf
-  GDK_PIXBUF_MODULEDIR:      $SNAP/usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/gdk-pixbuf-2.0/2.10.0/loaders
-  GDK_PIXBUF_MODULE_FILE:    $SNAP_DATA/lib/gdk-pixbuf-2.0/2.10.0/loaders.cache
-  ARCH_TRIPLET:              ${SNAPCRAFT_ARCH_TRIPLET}
 
 apps:
   smoke-test:
@@ -105,6 +101,8 @@ layout:
     bind: $SNAP/usr/share/icons
   /usr/share/glib-2.0/schemas:
     bind: $SNAP/usr/share/glib-2.0/schemas
+  /usr/lib/$SNAPCRAFT_ARCH_TRIPLET/gdk-pixbuf-2.0:
+    bind: $SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/gdk-pixbuf-2.0
   /usr/share/libdrm:  # Needed by mesa-core20 on AMD GPUs
     bind: $SNAP/graphics/libdrm
   /usr/share/drirc.d:  # Used by mesa-core20 for app specific workarounds
@@ -186,10 +184,16 @@ parts:
     plugin: nil
     build-packages:
       - libglib2.0-0
+      - libgdk-pixbuf2.0-0
     override-build: |
       snapcraftctl build
       update-mime-database $SNAPCRAFT_PART_INSTALL/usr/share/mime
+      # Compile the gsettings schemas
       /usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/glib-2.0/glib-compile-schemas "$SNAPCRAFT_PART_INSTALL/usr/share/glib-2.0/schemas"
+      # Index the pixbuf loaders
+      GDK_PIXBUF_MODULEDIR=$SNAPCRAFT_PART_INSTALL/usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/gdk-pixbuf-2.0/2.10.0/loaders
+      "/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/gdk-pixbuf-2.0/gdk-pixbuf-query-loaders" > "$SNAPCRAFT_PART_INSTALL/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/gdk-pixbuf-2.0/2.10.0/loaders.cache"
+      sed s!$SNAPCRAFT_PART_INSTALL!!g --in-place "$SNAPCRAFT_PART_INSTALL/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/gdk-pixbuf-2.0/2.10.0/loaders.cache"
     stage-packages:
       - gnome-sudoku
 
