@@ -103,6 +103,8 @@ layout:
     bind: $SNAP/usr/share/fonts
   /usr/share/icons:
     bind: $SNAP/usr/share/icons
+  /usr/share/glib-2.0/schemas:
+    bind: $SNAP/usr/share/glib-2.0/schemas
   /usr/share/libdrm:  # Needed by mesa-core20 on AMD GPUs
     bind: $SNAP/graphics/libdrm
   /usr/share/drirc.d:  # Used by mesa-core20 for app specific workarounds
@@ -182,9 +184,12 @@ parts:
 
   gtk3-apps:
     plugin: nil
+    build-packages:
+      - libglib2.0-0
     override-build: |
       snapcraftctl build
       update-mime-database $SNAPCRAFT_PART_INSTALL/usr/share/mime
+      /usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/glib-2.0/glib-compile-schemas "$SNAPCRAFT_PART_INSTALL/usr/share/glib-2.0/schemas"
     stage-packages:
       - gnome-sudoku
 
