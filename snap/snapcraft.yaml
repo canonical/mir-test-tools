@@ -103,6 +103,8 @@ layout:
     bind: $SNAP/usr/share/glib-2.0/schemas
   /usr/lib/$SNAPCRAFT_ARCH_TRIPLET/gdk-pixbuf-2.0:
     bind: $SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/gdk-pixbuf-2.0
+  /usr/share/glmark2:
+    bind: $SNAP/usr/share/glmark2
   /usr/share/libdrm:  # Needed by mesa-core20 on AMD GPUs
     bind: $SNAP/graphics/libdrm
   /usr/share/drirc.d:  # Used by mesa-core20 for app specific workarounds
