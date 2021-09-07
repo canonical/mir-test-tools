@@ -182,11 +182,9 @@ parts:
       spinning-rect.qml: qml/spinning-rect.qml
       spinning-rect.sh: qml/spinning-rect.sh
 
-  gtk3-apps:
-    plugin: nil
-    build-packages:
-      - libglib2.0-0
-      - libgdk-pixbuf2.0-0
+  gtk3app:
+    plugin: dump
+    source: gtk3
     override-build: |
       snapcraftctl build
       update-mime-database $SNAPCRAFT_PART_INSTALL/usr/share/mime
@@ -198,10 +196,18 @@ parts:
       sed s!$SNAPCRAFT_PART_INSTALL!!g --in-place "$SNAPCRAFT_PART_INSTALL/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/gdk-pixbuf-2.0/2.10.0/loaders.cache"
     stage-packages:
       - gnome-sudoku
-
-  gtk3app:
-    plugin: dump
-    source: gtk3
+    build-packages: # These are actually for override-prime - which needs them in the build environment
+      - libglib2.0-0
+      - libgdk-pixbuf2.0-0
+      - librsvg2-dev # So the libpixbufloader-svg.so loader can be loaded by gdk-pixbuf-query-loaders
+    override-prime: |
+      snapcraftctl prime
+      # Compile the gsettings schemas
+      /usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/glib-2.0/glib-compile-schemas "$SNAPCRAFT_PRIME/usr/share/glib-2.0/schemas"
+      # Index the pixbuf loaders
+      GDK_PIXBUF_MODULEDIR=$SNAPCRAFT_PRIME/usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/gdk-pixbuf-2.0/2.10.0/loaders
+      "/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/gdk-pixbuf-2.0/gdk-pixbuf-query-loaders" > "$SNAPCRAFT_PRIME/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/gdk-pixbuf-2.0/2.10.0/loaders.cache"
+      sed s!$SNAPCRAFT_PRIME!!g --in-place "$SNAPCRAFT_PRIME/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/gdk-pixbuf-2.0/2.10.0/loaders.cache"
 
   performance:
     plugin: dump
@@ -222,7 +228,7 @@ parts:
       - libbz2-1.0
 
   cleanup:
-    after: [mir-test-tools, icons, sdl2-apps, qmldemo, gtk3-apps, gtk3app, performance, wrapper, xwayland]
+    after: [mir-test-tools, icons, sdl2-apps, qmldemo, gtk3app, performance, wrapper, xwayland]
     plugin: nil
     build-snaps: [ mesa-core20 ]
     override-prime: |
