@@ -17,7 +17,7 @@ environment:
   # XDG config
   XDG_CONFIG_HOME: $SNAP_USER_DATA/.config
   XDG_DATA_HOME:   $SNAP_USER_DATA
-  XDG_DATA_DIRS:   $SNAP/usr/share:$SNAP_DATA
+  XDG_DATA_DIRS:   $SNAP/usr/share
   XDG_CONFIG_DIRS: $SNAP/etc/xdg
   XDG_CACHE_HOME:  $SNAP_USER_COMMON/.cache
   # Prep for Mir
@@ -99,8 +99,6 @@ layout:
     bind: $SNAP/usr/share/fonts
   /usr/share/icons:
     bind: $SNAP/usr/share/icons
-  /usr/share/glib-2.0/schemas:
-    bind: $SNAP/usr/share/glib-2.0/schemas
   /usr/lib/$SNAPCRAFT_ARCH_TRIPLET/gdk-pixbuf-2.0:
     bind: $SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/gdk-pixbuf-2.0
   /usr/share/glmark2:
