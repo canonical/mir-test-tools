@@ -13,27 +13,30 @@ architectures:
 
 environment:
   LC_ALL: C.UTF-8
-  XCURSOR_PATH: $SNAP/icons
+  XCURSOR_PATH: $SNAP/usr/share/icons
   # XDG config
   XDG_CONFIG_HOME: $SNAP_USER_DATA/.config
+  XDG_DATA_HOME:   $SNAP_USER_DATA
+  XDG_DATA_DIRS:   $SNAP/usr/share
+  XDG_CONFIG_DIRS: $SNAP/etc/xdg
+  XDG_CACHE_HOME:  $SNAP_USER_COMMON/.cache
   # Prep for Mir
-  MIR_CLIENT_PLATFORM_PATH: ${SNAP}/usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/mir/client-platform
   MIR_SERVER_PLATFORM_PATH: ${SNAP}/usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/mir/server-platform
-  LD_LIBRARY_PATH:    $SNAP/graphics/lib
-  LIBGL_DRIVERS_PATH: $SNAP/graphics/dri
-  LIBVA_DRIVERS_PATH: $SNAP/graphics/dri
+  # Graphics
+  LD_LIBRARY_PATH:           $SNAP/graphics/lib
+  LIBGL_DRIVERS_PATH:        $SNAP/graphics/dri
+  LIBVA_DRIVERS_PATH:        $SNAP/graphics/dri
+  __EGL_VENDOR_LIBRARY_DIRS: $SNAP/graphics/glvnd/egl_vendor.d
 
 apps:
   smoke-test:
     command-chain:
-      - bin/desktop-launch
       - bin/wrapper
     command: usr/bin/mir-smoke-test-runner
 
   # SDL2 example
   sdl2-test:
     command-chain:
-      - bin/desktop-launch
       - bin/wrapper
     command: usr/bin/mir_demo_server --test-client neverputt
     plugs:
@@ -50,7 +53,6 @@ apps:
   # Qt example
   qt-test:
     command-chain:
-      - bin/desktop-launch
       - bin/wrapper
     command: usr/bin/mir_demo_server --test-client $SNAP/qml/spinning-rect.sh
     environment:
@@ -62,7 +64,6 @@ apps:
   # GTK3+ example
   gtk3-test:
     command-chain:
-      - bin/desktop-launch
       - bin/wrapper
     command: usr/bin/mir_demo_server --test-client $SNAP/gtkapp.sh
     environment:
@@ -71,7 +72,6 @@ apps:
   performance-test:
     command-chain:
       - bin/performance-env.sh
-      - bin/desktop-launch
       - bin/wrapper
     command: usr/bin/mir_performance_tests
     plugs:
@@ -82,19 +82,6 @@ plugs:
   opengl:
   x11:
   login-session-control:
-  # For GTK3+
-  gtk-3-themes:
-    interface: content
-    target: $SNAP/data-dir/themes
-    default-provider: gtk-common-themes
-  icon-themes:
-    interface: content
-    target: $SNAP/data-dir/icons
-    default-provider: gtk-common-themes
-  sound-themes:
-    interface: content
-    target: $SNAP/data-dir/sounds
-    default-provider: gtk-common-themes
   graphics-core20:
     interface: content
     target: $SNAP/graphics
@@ -104,14 +91,30 @@ slots:
   wayland:
 
 layout:
-  /usr/share:
-    bind: $SNAP/usr/share
+  /usr/share/X11:
+    bind: $SNAP/usr/share/X11
+  /etc/fonts:
+    bind: $SNAP/etc/fonts
+  /usr/share/fonts:
+    bind: $SNAP/usr/share/fonts
+  /usr/share/icons:
+    bind: $SNAP/usr/share/icons
+  /usr/lib/$SNAPCRAFT_ARCH_TRIPLET/gdk-pixbuf-2.0:
+    bind: $SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/gdk-pixbuf-2.0
+  /usr/share/glmark2:
+    bind: $SNAP/usr/share/glmark2
+  /usr/share/libdrm:  # Needed by mesa-core20 on AMD GPUs
+    bind: $SNAP/graphics/libdrm
+  /usr/share/drirc.d:  # Used by mesa-core20 for app specific workarounds
+    bind: $SNAP/graphics/drirc.d
   /usr/bin/Xwayland:
     symlink: $SNAP/usr/bin/Xwayland
   /usr/bin/xkbcomp:
     symlink: $SNAP/usr/bin/xkbcomp
   /usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/pulseaudio:
     bind: $SNAP/usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/pulseaudio
+  /etc/gtk-3.0:
+    bind: $SNAP/etc/gtk-3.0
 
 parts:
   ppa-setup:
@@ -177,27 +180,26 @@ parts:
       spinning-rect.qml: qml/spinning-rect.qml
       spinning-rect.sh: qml/spinning-rect.sh
 
-  snapcraft-desktop-helpers:
-    source: https://github.com/ubuntu/snapcraft-desktop-helpers.git
-    source-subdir: gtk
-    plugin: make
-    make-parameters: ["FLAVOR=gtk3"]
-    build-packages:
-      - build-essential
-      - libgtk-3-dev
-    override-build: |
-      snapcraftctl build
-      # desktop-launch doesn't handle running without a user session very well, this avoids slow startup here
-      sed --in-place s'/^  needs_update=true/:/' $SNAPCRAFT_PART_INSTALL/bin/desktop-launch
-
-  gtk3-apps:
-    plugin: nil
-    stage-packages:
-      - gnome-sudoku
-
   gtk3app:
     plugin: dump
     source: gtk3
+    override-build: |
+      snapcraftctl build
+      update-mime-database $SNAPCRAFT_PART_INSTALL/usr/share/mime
+    stage-packages:
+      - gnome-sudoku
+    build-packages: # These are actually for override-prime - which needs them in the build environment
+      - libglib2.0-0
+      - libgdk-pixbuf2.0-0
+      - librsvg2-dev # So the libpixbufloader-svg.so loader can be loaded by gdk-pixbuf-query-loaders
+    override-prime: |
+      snapcraftctl prime
+      # Compile the gsettings schemas
+      /usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/glib-2.0/glib-compile-schemas "$SNAPCRAFT_PRIME/usr/share/glib-2.0/schemas"
+      # Index the pixbuf loaders
+      GDK_PIXBUF_MODULEDIR=$SNAPCRAFT_PRIME/usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/gdk-pixbuf-2.0/2.10.0/loaders \
+      "/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/gdk-pixbuf-2.0/gdk-pixbuf-query-loaders" > "$SNAPCRAFT_PRIME/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/gdk-pixbuf-2.0/2.10.0/loaders.cache"
+      sed s!$SNAPCRAFT_PRIME!!g --in-place "$SNAPCRAFT_PRIME/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/gdk-pixbuf-2.0/2.10.0/loaders.cache"
 
   performance:
     plugin: dump
@@ -218,7 +220,7 @@ parts:
       - libbz2-1.0
 
   cleanup:
-    after: [mir-test-tools, icons, sdl2-apps, qmldemo, snapcraft-desktop-helpers, gtk3-apps, gtk3app, performance, wrapper, xwayland]
+    after: [mir-test-tools, icons, sdl2-apps, qmldemo, gtk3app, performance, wrapper, xwayland]
     plugin: nil
     build-snaps: [ mesa-core20 ]
     override-prime: |

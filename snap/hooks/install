@@ -1,6 +1,0 @@
-#!/bin/bash
-set -x
-
-snapctl set vt=5
-
-exec $(dirname "${BASH_SOURCE[0]}")/post-refresh
