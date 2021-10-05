@@ -1,9 +1,9 @@
 #!/bin/bash
 set -e
 
-if [ $(id -u) != 0 ] && ! [ -v DISPLAY ] && ! snapctl is-connected login-session-control; then
-  echo "ERROR: You need one of: root, a DISPLAY, or to connect the login-session-control interface."
-  echo "e.g. sudo snap connect" $SNAP_NAME":login-session-control :login-session-control"
+if ! snapctl is-connected graphics-core20; then
+  echo "ERROR: You need to connect the graphics-core20 interface."
+  echo "e.g. sudo snap connect" $SNAP_NAME":graphics-core20 mesa-core20:graphics-core20"
   exit 1
 fi
 
@@ -14,11 +14,23 @@ if [ -v MIR_SERVER_WAYLAND_HOST ]; then
   export MIR_SERVER_CONSOLE_PROVIDER
   host_wayland=$(dirname "${XDG_RUNTIME_DIR}")/${MIR_SERVER_WAYLAND_HOST}
   if [ ! -O "${host_wayland}" ] || [ ! -O "${host_wayland}.lock" ]; then
-    echo "ERROR: MIR_SERVER_WAYLAND_HOST [${MIR_SERVER_WAYLAND_HOST}] not set up"
+    echo "ERROR: MIR_SERVER_WAYLAND_HOST [${MIR_SERVER_WAYLAND_HOST}] set, but not available"
     exit 1
   fi
   ln -sf "${host_wayland}" "$XDG_RUNTIME_DIR"
   ln -sf "${host_wayland}.lock" "$XDG_RUNTIME_DIR"
+elif [ -v DISPLAY ] && ! snapctl is-connected x11; then
+  echo "ERROR: DISPLAY [${DISPLAY}] set, but you need to connect the x11 interface"
+  echo "Try: sudo snap connect" $SNAP_NAME":x11"
+  exit 1
+elif [ $(id -u) != 0 ] && ! [ -v DISPLAY ] && ! snapctl is-connected login-session-control; then
+  echo "ERROR: You need one of:"
+  echo "  1. An X11 host specified by DISPLAY environment variable"
+  echo "  2. The login-session-control interface connected"
+  echo "     Try: sudo snap connect" $SNAP_NAME":login-session-control"
+  echo "  3. Root (run with sudo)"
+  echo "  4. A Wayland host specified by MIR_SERVER_WAYLAND_HOST environment variable"
+  exit 1
 fi
 
 # This ensures the best possible diagnostics whenever we fail to start.
