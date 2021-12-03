@@ -11,6 +11,12 @@ architectures:
   - build-on: armhf
 #  - build-on: i386
 
+package-repositories:
+  - type: apt
+    ppa: mir-team/release
+  - type: apt
+    ppa: graphics-drivers/ppa
+
 environment:
   LC_ALL: C.UTF-8
   XCURSOR_PATH: $SNAP/usr/share/icons
@@ -117,16 +123,6 @@ layout:
     bind: $SNAP/etc/gtk-3.0
 
 parts:
-  ppa-setup:
-    plugin: nil
-    override-pull: |
-      sudo apt --assume-yes install software-properties-common
-      if [ $(arch) = "x86_64" ]; then
-        sudo add-apt-repository -yn ppa:graphics-drivers/ppa
-      fi
-      sudo add-apt-repository -yu ppa:mir-team/release
-      snapcraftctl pull
-
   recipe-version:
     plugin: nil
     source: .
@@ -137,7 +133,7 @@ parts:
       - -recipe-version
 
   mir-test-tools:
-    after: [ recipe-version, ppa-setup ]
+    after: [ recipe-version ]
     plugin: nil
     override-pull: |
       snapcraftctl pull
