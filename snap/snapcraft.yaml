@@ -139,12 +139,6 @@ parts:
   mir-test-tools:
     after: [ recipe-version, ppa-setup ]
     plugin: nil
-    override-pull: |
-      snapcraftctl pull
-      mir_version=`LANG=C apt-cache policy mir-test-tools | sed -rne 's/^\s+Candidate:\s+([^-]*)-.+$/\1/p'`
-      recipe_version=`cat $SNAPCRAFT_STAGE/recipe-version`
-      snapcraftctl set-version $mir_version-snap$recipe_version
-      if echo $mir_version | grep -e '+dev' -e '~rc' -q; then snapcraftctl set-grade devel; else snapcraftctl set-grade stable; fi
     stage-packages:
     - fonts-freefont-ttf
     - mir-graphics-drivers-desktop
@@ -153,6 +147,12 @@ parts:
     - glmark2-data
     - glmark2-es2-wayland
     - on amd64: [mir-graphics-drivers-nvidia]
+    override-build: |
+      mir_version=`LANG=C apt-cache policy mir-test-tools | sed -rne 's/^\s+Candidate:\s+([^-]*)-.+$/\1/p'`
+      recipe_version=`cat $SNAPCRAFT_STAGE/recipe-version`
+      snapcraftctl set-version $mir_version-snap$recipe_version
+      if echo $mir_version | grep -e '+dev' -e '~rc' -q; then snapcraftctl set-grade devel; else snapcraftctl set-grade stable; fi
+      snapcraftctl build
 
   icons:
     plugin: nil
