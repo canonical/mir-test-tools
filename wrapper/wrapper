@@ -37,4 +37,8 @@ fi
 export MIR_MESA_KMS_DISABLE_MODESET_PROBE=
 unset WAYLAND_DISPLAY
 
+# Use any quirks the driver needs
+mkdir -p "${XDG_CONFIG_HOME}/mir"
+ln -sf "${SNAP}/graphics/etc/mir-quirks" "${XDG_CONFIG_HOME}/mir/mir_demo_server.config"
+
 exec "$@"
