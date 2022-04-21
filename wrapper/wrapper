@@ -33,6 +33,14 @@ elif [ $(id -u) != 0 ] && ! [ -v DISPLAY ] && ! snapctl is-connected login-sessi
   exit 1
 fi
 
+# Use hack in snapd for proprietary nVidia drivers mounts the drivers in
+# /var/lib/snapd/lib/gl that needs to be in LD_LIBRARY_PATH
+# Without that OpenGL using apps do not work with the nVidia drivers
+if [ -d /var/lib/snapd/lib/glvnd/egl_vendor.d ]; then
+  __EGL_VENDOR_LIBRARY_DIRS=${__EGL_VENDOR_LIBRARY_DIRS}:/var/lib/snapd/lib/glvnd/egl_vendor.d
+  LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:/var/lib/snapd/lib/gl:/var/lib/snapd/lib/gl/vdpau
+fi
+
 # This ensures the best possible diagnostics whenever we fail to start.
 export MIR_MESA_KMS_DISABLE_MODESET_PROBE=
 unset WAYLAND_DISPLAY
