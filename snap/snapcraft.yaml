@@ -3,7 +3,7 @@ adopt-info: mir-test-tools
 summary: Mir test scripts and applications
 description: Mir test scripts and applications
 confinement: strict
-base: core20
+base: core22
 
 architectures:
   - build-on: amd64
@@ -28,23 +28,18 @@ environment:
   XDG_CACHE_HOME:  $SNAP_USER_COMMON/.cache
   # Prep for Mir
   MIR_SERVER_PLATFORM_PATH: ${SNAP}/usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/mir/server-platform
-  # Graphics
-  LD_LIBRARY_PATH:                     $SNAP/graphics/lib
-  LIBGL_DRIVERS_PATH:                  $SNAP/graphics/dri
-  LIBVA_DRIVERS_PATH:                  $SNAP/graphics/dri
-  __EGL_VENDOR_LIBRARY_DIRS:           $SNAP/graphics/glvnd/egl_vendor.d
-  __EGL_EXTERNAL_PLATFORM_CONFIG_DIRS: $SNAP/usr/share/egl/egl_external_platform.d
-
 
 apps:
   smoke-test:
     command-chain:
+      - bin/setup-graphics
       - bin/wrapper
     command: usr/bin/mir-smoke-test-runner
 
   # SDL2 example
   sdl2-test:
     command-chain:
+      - bin/setup-graphics
       - bin/wrapper
     command: usr/bin/mir_demo_server --test-client neverputt
     plugs:
@@ -61,6 +56,7 @@ apps:
   # Qt example
   qt-test:
     command-chain:
+      - bin/setup-graphics
       - bin/wrapper
     command: usr/bin/mir_demo_server --test-client $SNAP/qml/spinning-rect.sh
     environment:
@@ -72,6 +68,7 @@ apps:
   # GTK3+ example
   gtk3-test:
     command-chain:
+      - bin/setup-graphics
       - bin/wrapper
     command: usr/bin/mir_demo_server --test-client $SNAP/gtkapp.sh
     environment:
@@ -79,6 +76,7 @@ apps:
 
   performance-test:
     command-chain:
+      - bin/setup-graphics
       - bin/performance-env.sh
       - bin/wrapper
     command: usr/bin/mir_performance_tests
@@ -90,10 +88,10 @@ plugs:
   opengl:
   x11:
   login-session-control:
-  graphics-core20:
+  graphics-core22:
     interface: content
     target: $SNAP/graphics
-    default-provider: mesa-core20
+    default-provider: mesa-core22
 
 slots:
   wayland:
@@ -111,10 +109,10 @@ layout:
     bind: $SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/gdk-pixbuf-2.0
   /usr/share/glmark2:
     bind: $SNAP/usr/share/glmark2
-  /usr/share/libdrm:  # Needed by mesa-core20 on AMD GPUs
+  /usr/share/libdrm:  # Needed by mesa-core22 on AMD GPUs
     bind: $SNAP/graphics/libdrm
-  /usr/share/drirc.d:  # Used by mesa-core20 for app specific workarounds
-    bind: $SNAP/graphics/drirc.d
+  /usr/share/drirc.d:  # Used by mesa-core22 for app specific workarounds
+    symlink: $SNAP/graphics/drirc.d
   /usr/bin/Xwayland:
     symlink: $SNAP/usr/bin/Xwayland
   /usr/bin/xkbcomp:
@@ -127,8 +125,8 @@ layout:
 parts:
   mir-test-tools:
     plugin: nil
-    override-pull: |
-      snapcraftctl pull
+    override-build: |
+      craftctl default
       mir_version=`LANG=C apt-cache policy mir-test-tools | sed -rne 's/^\s+Candidate:\s+([^-]*)-.+$/\1/p'`
       recipe_version=`git -C ${SNAPCRAFT_PROJECT_DIR} rev-list --count HEAD`
       craftctl set version=$mir_version-snap$recipe_version
@@ -172,7 +170,7 @@ parts:
     plugin: dump
     source: gtk3
     override-build: |
-      snapcraftctl build
+      craftctl default
       update-mime-database $SNAPCRAFT_PART_INSTALL/usr/share/mime
     stage-packages:
       - gnome-sudoku
@@ -181,7 +179,7 @@ parts:
       - libgdk-pixbuf2.0-0
       - librsvg2-dev # So the libpixbufloader-svg.so loader can be loaded by gdk-pixbuf-query-loaders
     override-prime: |
-      snapcraftctl prime
+      craftctl default
       # Compile the gsettings schemas
       /usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/glib-2.0/glib-compile-schemas "$SNAPCRAFT_PRIME/usr/share/glib-2.0/schemas"
       # Index the pixbuf loaders
@@ -199,6 +197,7 @@ parts:
     plugin: dump
     source: wrapper
     organize:
+      setup-graphics: bin/setup-graphics
       wrapper: bin/wrapper
 
   xwayland:
@@ -210,10 +209,9 @@ parts:
   cleanup:
     after: [mir-test-tools, icons, sdl2-apps, qmldemo, gtk3app, performance, wrapper, xwayland]
     plugin: nil
-    build-snaps: [ mesa-core20 ]
+    build-snaps: [ mesa-core22 ]
     override-prime: |
       set -eux
-      cd /snap/mesa-core20/current/egl/lib
-      find . -type f,l -exec rm -f $SNAPCRAFT_PRIME/usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/{} \;
-      rm -fr "$SNAPCRAFT_PRIME/usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/dri"
-      rm -rf "$SNAPCRAFT_PRIME/usr/share/"{bug,lintian,man,doc}      
+      cd /snap/mesa-core22/current/
+      find . -type f,l -exec rm -f $CRAFT_PRIME/{} \;
+      rm -rf "$CRAFT_PRIME/usr/share/"{bug,lintian,man,doc}
