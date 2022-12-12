@@ -119,30 +119,20 @@ layout:
     symlink: $SNAP/usr/bin/Xwayland
   /usr/bin/xkbcomp:
     symlink: $SNAP/usr/bin/xkbcomp
-  /usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/pulseaudio:
-    bind: $SNAP/usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/pulseaudio
+  /usr/lib/${CRAFT_ARCH_TRIPLET}/pulseaudio:
+    bind: $SNAP/usr/lib/${CRAFT_ARCH_TRIPLET}/pulseaudio
   /etc/gtk-3.0:
     bind: $SNAP/etc/gtk-3.0
 
 parts:
-  recipe-version:
-    plugin: nil
-    source: .
-    source-type: git
-    override-build: |
-      git rev-list --count HEAD > $SNAPCRAFT_PART_INSTALL/recipe-version
-    prime:
-      - -recipe-version
-
   mir-test-tools:
-    after: [ recipe-version ]
     plugin: nil
     override-pull: |
       snapcraftctl pull
       mir_version=`LANG=C apt-cache policy mir-test-tools | sed -rne 's/^\s+Candidate:\s+([^-]*)-.+$/\1/p'`
-      recipe_version=`cat $SNAPCRAFT_STAGE/recipe-version`
-      snapcraftctl set-version $mir_version-snap$recipe_version
-      if echo $mir_version | grep -e '+dev' -e '~rc' -q; then snapcraftctl set-grade devel; else snapcraftctl set-grade stable; fi
+      recipe_version=`git -C ${SNAPCRAFT_PROJECT_DIR} rev-list --count HEAD`
+      craftctl set version=$mir_version-snap$recipe_version
+      if echo $mir_version | grep -e '+dev' -e '~rc' -q; then craftctl set grade=devel; else craftctl set grade=stable; fi
     stage-packages:
     - fonts-freefont-ttf
     - mir-graphics-drivers-desktop
