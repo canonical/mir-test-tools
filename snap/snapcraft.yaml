@@ -16,9 +16,6 @@ package-repositories:
     ppa: mir-team/release
   - type: apt
     ppa: graphics-drivers/ppa
-  # temporary: LP#1973734
-  - type: apt
-    ppa: ci-train-ppa-service/4845
 
 environment:
   LC_ALL: C.UTF-8
