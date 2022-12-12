@@ -91,7 +91,7 @@ plugs:
   graphics-core22:
     interface: content
     target: $SNAP/graphics
-    default-provider: mesa-core22
+    default-provider: mesa-core22-test
 
 slots:
   wayland:
@@ -209,9 +209,9 @@ parts:
   cleanup:
     after: [mir-test-tools, icons, sdl2-apps, qmldemo, gtk3app, performance, wrapper, xwayland]
     plugin: nil
-    build-snaps: [ mesa-core22 ]
+    build-snaps: [ mesa-core22-test/edge ]
     override-prime: |
       set -eux
-      cd /snap/mesa-core22/current/
+      cd /snap/mesa-core22-test/current/
       find . -type f,l -exec rm -f $CRAFT_PRIME/{} \;
       rm -rf "$CRAFT_PRIME/usr/share/"{bug,lintian,man,doc}

@@ -3,7 +3,7 @@ set -e
 
 if ! snapctl is-connected graphics-core22; then
   echo "ERROR: You need to connect the graphics-core22 interface."
-  echo "e.g. sudo snap connect $SNAP_INSTANCE_NAME:graphics-core22 mesa-core22:graphics-core22"
+  echo "e.g. sudo snap connect $SNAP_INSTANCE_NAME:graphics-core22 mesa-core22-test:graphics-core22"
   exit 1
 fi
 
