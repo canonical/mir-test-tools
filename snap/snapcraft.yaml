@@ -109,8 +109,6 @@ layout:
     bind: $SNAP/usr/lib/$CRAFT_ARCH_TRIPLET/gdk-pixbuf-2.0
   /usr/share/glmark2:
     bind: $SNAP/usr/share/glmark2
-  /usr/share/libdrm:  # Needed by mesa-core22 on AMD GPUs
-    bind: $SNAP/graphics/libdrm
   /usr/share/drirc.d:  # Used by mesa-core22 for app specific workarounds
     symlink: $SNAP/graphics/drirc.d
   /usr/bin/Xwayland:
