@@ -1,12 +1,6 @@
 #!/bin/bash
 set -e
 
-if ! snapctl is-connected graphics-core20; then
-  echo "ERROR: You need to connect the graphics-core20 interface."
-  echo "e.g. sudo snap connect $SNAP_INSTANCE_NAME:graphics-core20 mesa-core20:graphics-core20"
-  exit 1
-fi
-
 mkdir -p "$XDG_RUNTIME_DIR" -m 700
 
 if [ -v MIR_SERVER_WAYLAND_HOST ]; then

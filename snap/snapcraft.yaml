@@ -3,7 +3,7 @@ adopt-info: mir-test-tools
 summary: Mir test scripts and applications
 description: Mir test scripts and applications
 confinement: strict
-base: core20
+base: core22
 
 architectures:
   - build-on: amd64
@@ -16,9 +16,6 @@ package-repositories:
     ppa: mir-team/release
   - type: apt
     ppa: graphics-drivers/ppa
-  # temporary: LP#1973734
-  - type: apt
-    ppa: ci-train-ppa-service/4845
 
 environment:
   LC_ALL: C.UTF-8
@@ -30,25 +27,22 @@ environment:
   XDG_CONFIG_DIRS: $SNAP/etc/xdg
   XDG_CACHE_HOME:  $SNAP_USER_COMMON/.cache
   # Prep for Mir
-  MIR_SERVER_PLATFORM_PATH: ${SNAP}/usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/mir/server-platform
-  # Graphics
-  LD_LIBRARY_PATH:                     $SNAP/graphics/lib
-  LIBGL_DRIVERS_PATH:                  $SNAP/graphics/dri
-  LIBVA_DRIVERS_PATH:                  $SNAP/graphics/dri
-  __EGL_VENDOR_LIBRARY_DIRS:           $SNAP/graphics/glvnd/egl_vendor.d
-  __EGL_EXTERNAL_PLATFORM_CONFIG_DIRS: $SNAP/usr/share/egl/egl_external_platform.d
-
+  MIR_SERVER_PLATFORM_PATH: ${SNAP}/usr/lib/${CRAFT_ARCH_TRIPLET}/mir/server-platform
+  # Setup XKB
+  XKB_CONFIG_ROOT: $SNAP/usr/share/X11/xkb
 
 apps:
   smoke-test:
     command-chain:
       - bin/wrapper
+      - bin/graphics-core22-wrapper
     command: usr/bin/mir-smoke-test-runner
 
   # SDL2 example
   sdl2-test:
     command-chain:
       - bin/wrapper
+      - bin/graphics-core22-wrapper
     command: usr/bin/mir_demo_server --test-client neverputt
     plugs:
       - pulseaudio
@@ -65,17 +59,19 @@ apps:
   qt-test:
     command-chain:
       - bin/wrapper
+      - bin/graphics-core22-wrapper
     command: usr/bin/mir_demo_server --test-client $SNAP/qml/spinning-rect.sh
     environment:
       # Prep for Qt wayland
-      QT_PLUGIN_PATH: ${SNAP}/usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/qt5/plugins/
-      QT_QPA_PLATFORM_PLUGIN_PATH: ${SNAP}/usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/qt5/plugins/platforms/
-      QML2_IMPORT_PATH: ${SNAP}/usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/qt5/qml
+      QT_PLUGIN_PATH: ${SNAP}/usr/lib/${CRAFT_ARCH_TRIPLET}/qt5/plugins/
+      QT_QPA_PLATFORM_PLUGIN_PATH: ${SNAP}/usr/lib/${CRAFT_ARCH_TRIPLET}/qt5/plugins/platforms/
+      QML2_IMPORT_PATH: ${SNAP}/usr/lib/${CRAFT_ARCH_TRIPLET}/qt5/qml
 
   # GTK3+ example
   gtk3-test:
     command-chain:
       - bin/wrapper
+      - bin/graphics-core22-wrapper
     command: usr/bin/mir_demo_server --test-client $SNAP/gtkapp.sh
     environment:
       PATH: $SNAP/bin/:$SNAP/usr/bin/:${SNAP}/usr/games:${PATH}
@@ -84,6 +80,7 @@ apps:
     command-chain:
       - bin/performance-env.sh
       - bin/wrapper
+      - bin/graphics-core22-wrapper
     command: usr/bin/mir_performance_tests
     plugs:
       - network-bind
@@ -93,59 +90,50 @@ plugs:
   opengl:
   x11:
   login-session-control:
-  graphics-core20:
+  graphics-core22:
     interface: content
     target: $SNAP/graphics
-    default-provider: mesa-core20
+    default-provider: mesa-core22
 
 slots:
   wayland:
 
 layout:
-  /usr/share/X11:
-    bind: $SNAP/usr/share/X11
-  /etc/fonts:
-    bind: $SNAP/etc/fonts
   /usr/share/fonts:
     bind: $SNAP/usr/share/fonts
   /usr/share/icons:
     bind: $SNAP/usr/share/icons
-  /usr/lib/$SNAPCRAFT_ARCH_TRIPLET/gdk-pixbuf-2.0:
-    bind: $SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/gdk-pixbuf-2.0
+  /usr/lib/$CRAFT_ARCH_TRIPLET/gdk-pixbuf-2.0:
+    symlink: $SNAP/usr/lib/$CRAFT_ARCH_TRIPLET/gdk-pixbuf-2.0
   /usr/share/glmark2:
-    bind: $SNAP/usr/share/glmark2
-  /usr/share/libdrm:  # Needed by mesa-core20 on AMD GPUs
-    bind: $SNAP/graphics/libdrm
-  /usr/share/drirc.d:  # Used by mesa-core20 for app specific workarounds
-    bind: $SNAP/graphics/drirc.d
+    symlink: $SNAP/usr/share/glmark2
+  /usr/share/drirc.d:  # Used by mesa-core22 for app specific workarounds
+    symlink: $SNAP/graphics/drirc.d
+  /usr/share/X11/XErrorDB:
+    symlink: $SNAP/graphics/X11/XErrorDB
+  /usr/share/X11/locale:
+    symlink: $SNAP/graphics/X11/locale
   /usr/bin/Xwayland:
     symlink: $SNAP/usr/bin/Xwayland
   /usr/bin/xkbcomp:
     symlink: $SNAP/usr/bin/xkbcomp
-  /usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/pulseaudio:
-    bind: $SNAP/usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/pulseaudio
+  /usr/lib/${CRAFT_ARCH_TRIPLET}/pulseaudio:
+    symlink: $SNAP/usr/lib/${CRAFT_ARCH_TRIPLET}/pulseaudio
+  # these could be avoided through a desktop plug
   /etc/gtk-3.0:
     bind: $SNAP/etc/gtk-3.0
+  /etc/fonts:
+    bind: $SNAP/etc/fonts
 
 parts:
-  recipe-version:
-    plugin: nil
-    source: .
-    source-type: git
-    override-build: |
-      git rev-list --count HEAD > $SNAPCRAFT_PART_INSTALL/recipe-version
-    prime:
-      - -recipe-version
-
   mir-test-tools:
-    after: [ recipe-version ]
     plugin: nil
-    override-pull: |
-      snapcraftctl pull
+    override-build: |
+      craftctl default
       mir_version=`LANG=C apt-cache policy mir-test-tools | sed -rne 's/^\s+Candidate:\s+([^-]*)-.+$/\1/p'`
-      recipe_version=`cat $SNAPCRAFT_STAGE/recipe-version`
-      snapcraftctl set-version $mir_version-snap$recipe_version
-      if echo $mir_version | grep -e '+dev' -e '~rc' -q; then snapcraftctl set-grade devel; else snapcraftctl set-grade stable; fi
+      recipe_version=`git -C ${CRAFT_PROJECT_DIR} rev-list --count HEAD`
+      craftctl set version=$mir_version-snap$recipe_version
+      if echo $mir_version | grep -e '+dev' -e '~rc' -q; then craftctl set grade=devel; else craftctl set grade=stable; fi
     stage-packages:
     - fonts-freefont-ttf
     - mir-graphics-drivers-desktop
@@ -185,8 +173,8 @@ parts:
     plugin: dump
     source: gtk3
     override-build: |
-      snapcraftctl build
-      update-mime-database $SNAPCRAFT_PART_INSTALL/usr/share/mime
+      craftctl default
+      update-mime-database $CRAFT_PART_INSTALL/usr/share/mime
     stage-packages:
       - gnome-sudoku
     build-packages: # These are actually for override-prime - which needs them in the build environment
@@ -194,13 +182,13 @@ parts:
       - libgdk-pixbuf2.0-0
       - librsvg2-dev # So the libpixbufloader-svg.so loader can be loaded by gdk-pixbuf-query-loaders
     override-prime: |
-      snapcraftctl prime
+      craftctl default
       # Compile the gsettings schemas
-      /usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/glib-2.0/glib-compile-schemas "$SNAPCRAFT_PRIME/usr/share/glib-2.0/schemas"
+      /usr/lib/${CRAFT_ARCH_TRIPLET}/glib-2.0/glib-compile-schemas "$CRAFT_PRIME/usr/share/glib-2.0/schemas"
       # Index the pixbuf loaders
-      GDK_PIXBUF_MODULEDIR=$SNAPCRAFT_PRIME/usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/gdk-pixbuf-2.0/2.10.0/loaders \
-      "/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/gdk-pixbuf-2.0/gdk-pixbuf-query-loaders" > "$SNAPCRAFT_PRIME/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/gdk-pixbuf-2.0/2.10.0/loaders.cache"
-      sed s!$SNAPCRAFT_PRIME!!g --in-place "$SNAPCRAFT_PRIME/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/gdk-pixbuf-2.0/2.10.0/loaders.cache"
+      GDK_PIXBUF_MODULEDIR=$CRAFT_PRIME/usr/lib/${CRAFT_ARCH_TRIPLET}/gdk-pixbuf-2.0/2.10.0/loaders \
+      "/usr/lib/$CRAFT_ARCH_TRIPLET/gdk-pixbuf-2.0/gdk-pixbuf-query-loaders" > "$CRAFT_PRIME/usr/lib/$CRAFT_ARCH_TRIPLET/gdk-pixbuf-2.0/2.10.0/loaders.cache"
+      sed s!$CRAFT_PRIME!!g --in-place "$CRAFT_PRIME/usr/lib/$CRAFT_ARCH_TRIPLET/gdk-pixbuf-2.0/2.10.0/loaders.cache"
 
   performance:
     plugin: dump
@@ -220,13 +208,12 @@ parts:
       - xwayland
       - libbz2-1.0
 
-  cleanup:
+  graphics-core22:
     after: [mir-test-tools, icons, sdl2-apps, qmldemo, gtk3app, performance, wrapper, xwayland]
-    plugin: nil
-    build-snaps: [ mesa-core20 ]
+    source: https://github.com/MirServer/graphics-core22.git
+    plugin: dump
     override-prime: |
-      set -eux
-      cd /snap/mesa-core20/current/egl/lib
-      find . -type f,l -exec rm -f $SNAPCRAFT_PRIME/usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/{} \;
-      rm -fr "$SNAPCRAFT_PRIME/usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/dri"
-      rm -rf "$SNAPCRAFT_PRIME/usr/share/"{bug,lintian,man,doc}      
+      craftctl default
+      ${CRAFT_PART_SRC}/bin/graphics-core22-cleanup mesa-core22
+    prime:
+      - bin/graphics-core22-wrapper
