@@ -28,6 +28,8 @@ environment:
   XDG_CACHE_HOME:  $SNAP_USER_COMMON/.cache
   # Prep for Mir
   MIR_SERVER_PLATFORM_PATH: ${SNAP}/usr/lib/${CRAFT_ARCH_TRIPLET}/mir/server-platform
+  # Setup XKB
+  XKB_CONFIG_ROOT: $SNAP/usr/share/X11/xkb
 
 apps:
   smoke-test:
@@ -97,28 +99,31 @@ slots:
   wayland:
 
 layout:
-  /usr/share/X11:
-    bind: $SNAP/usr/share/X11
-  /etc/fonts:
-    bind: $SNAP/etc/fonts
   /usr/share/fonts:
     bind: $SNAP/usr/share/fonts
   /usr/share/icons:
     bind: $SNAP/usr/share/icons
   /usr/lib/$CRAFT_ARCH_TRIPLET/gdk-pixbuf-2.0:
-    bind: $SNAP/usr/lib/$CRAFT_ARCH_TRIPLET/gdk-pixbuf-2.0
+    symlink: $SNAP/usr/lib/$CRAFT_ARCH_TRIPLET/gdk-pixbuf-2.0
   /usr/share/glmark2:
-    bind: $SNAP/usr/share/glmark2
+    symlink: $SNAP/usr/share/glmark2
   /usr/share/drirc.d:  # Used by mesa-core22 for app specific workarounds
     symlink: $SNAP/graphics/drirc.d
+  /usr/share/X11/XErrorDB:
+    symlink: $SNAP/graphics/X11/XErrorDB
+  /usr/share/X11/locale:
+    symlink: $SNAP/graphics/X11/locale
   /usr/bin/Xwayland:
     symlink: $SNAP/usr/bin/Xwayland
   /usr/bin/xkbcomp:
     symlink: $SNAP/usr/bin/xkbcomp
   /usr/lib/${CRAFT_ARCH_TRIPLET}/pulseaudio:
-    bind: $SNAP/usr/lib/${CRAFT_ARCH_TRIPLET}/pulseaudio
+    symlink: $SNAP/usr/lib/${CRAFT_ARCH_TRIPLET}/pulseaudio
+  # these could be avoided through a desktop plug
   /etc/gtk-3.0:
     bind: $SNAP/etc/gtk-3.0
+  /etc/fonts:
+    bind: $SNAP/etc/fonts
 
 parts:
   mir-test-tools:
