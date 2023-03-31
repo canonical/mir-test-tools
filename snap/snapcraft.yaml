@@ -28,8 +28,6 @@ environment:
   XDG_CACHE_HOME:  $SNAP_USER_COMMON/.cache
   # Prep for Mir
   MIR_SERVER_PLATFORM_PATH: ${SNAP}/usr/lib/${CRAFT_ARCH_TRIPLET}/mir/server-platform
-  # Setup XKB
-  XKB_CONFIG_ROOT: $SNAP/usr/share/X11/xkb
 
 apps:
   smoke-test:
@@ -113,6 +111,8 @@ layout:
     symlink: $SNAP/graphics/X11/XErrorDB
   /usr/share/X11/locale:
     symlink: $SNAP/graphics/X11/locale
+  /usr/share/X11/xkb:
+    symlink: $SNAP/usr/share/X11/xkb
   /usr/bin/Xwayland:
     symlink: $SNAP/usr/bin/Xwayland
   /usr/bin/xkbcomp:
