@@ -12,7 +12,7 @@ else
     echo "ERROR:  Please either disconnect the x11 plug or provide a --gtest_filter:"
     echo "    sudo snap disconnect ${SNAP_INSTANCE_NAME}:x11"
     echo "  Or:"
-    echo "    ${SNAP_INSTANCE_NAME} --gtest_filter=-GLMark2Xwayland.*"
+    echo "    ${SNAP_INSTANCE_NAME}.performance-test --gtest_filter=-GLMark2Xwayland.*"
     exit 1
   fi
 fi
