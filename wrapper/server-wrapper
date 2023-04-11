@@ -1,4 +1,10 @@
 #!/bin/sh
 export XDG_RUNTIME_DIR=$( dirname $XDG_RUNTIME_DIR )
 
+if [ -n "${WAYLAND_DISPLAY}" ] && [ -O "${XDG_RUNTIME_DIR}/${WAYLAND_DISPLAY}" ]
+then
+  echo "ERROR: WAYLAND_DISPLAY is set, and already provided by a compositor. Mir will be unable to start!"
+  exit 1
+fi
+
 exec "$@"
