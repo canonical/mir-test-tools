@@ -85,6 +85,7 @@ apps:
 
   demo-server:
     command-chain:
+      - bin/server-wrapper
       - bin/wrapper
       - bin/graphics-core22-wrapper
     command: usr/bin/mir_demo_server
@@ -207,6 +208,7 @@ parts:
     source: wrapper
     organize:
       wrapper: bin/wrapper
+      server-wrapper: bin/server-wrapper
 
   xwayland:
     plugin: nil

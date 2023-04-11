@@ -1,0 +1,4 @@
+#!/bin/sh
+export XDG_RUNTIME_DIR=$( dirname $XDG_RUNTIME_DIR )
+
+exec "$@"
