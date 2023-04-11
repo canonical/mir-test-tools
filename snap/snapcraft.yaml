@@ -83,6 +83,12 @@ apps:
     plugs:
       - network-bind
 
+  demo-server:
+    command-chain:
+      - bin/wrapper
+      - bin/graphics-core22-wrapper
+    command: usr/bin/mir_demo_server
+
 plugs:
   # For Mir
   opengl:
