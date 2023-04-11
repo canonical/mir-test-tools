@@ -28,6 +28,7 @@ environment:
   XDG_CACHE_HOME:  $SNAP_USER_COMMON/.cache
   # Prep for Mir
   MIR_SERVER_PLATFORM_PATH: ${SNAP}/usr/lib/${CRAFT_ARCH_TRIPLET}/mir/server-platform
+  MIR_SERVER_X11_WINDOW_TITLE: ${SNAP_INSTANCE_NAME}
 
 apps:
   smoke-test:
