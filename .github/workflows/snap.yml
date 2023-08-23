@@ -10,7 +10,14 @@ jobs:
   Snap:
     runs-on: ubuntu-latest
 
-    timeout-minutes: 30
+    timeout-minutes: 60
+
+    strategy:
+      matrix:
+        platform:
+        - amd64
+        - armhf
+        - arm64
 
     steps:
     - name: Check out code
@@ -19,8 +26,9 @@ jobs:
         fetch-depth: 0  # needed for version determination
 
     - name: Build and publish the snap
-      uses: canonical/actions/build-snap@release
+      uses: canonical/actions/build-snap@multiarch
       with:
+        architecture: ${{ matrix.platform }}
         snapcraft-token: ${{ secrets.SNAPCRAFT_TOKEN }}
         publish: ${{ github.event_name == 'pull_request' && github.repository == github.event.pull_request.head.repo.full_name }}
         publish-channel: 22/edge/pr${{ github.event.number }}
