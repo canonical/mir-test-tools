@@ -153,6 +153,7 @@ parts:
     - glmark2-es2
     - glmark2-data
     - glmark2-es2-wayland
+    - mesa-utils
 
   icons:
     plugin: nil
