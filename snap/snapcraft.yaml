@@ -27,7 +27,7 @@ environment:
   XDG_CONFIG_DIRS: $SNAP/etc/xdg
   XDG_CACHE_HOME:  $SNAP_USER_COMMON/.cache
   # Prep for Mir
-  MIR_SERVER_PLATFORM_PATH: ${SNAP}/usr/lib/${CRAFT_ARCH_TRIPLET}/mir/server-platform
+  MIR_SERVER_PLATFORM_PATH: ${SNAP}/usr/lib/${CRAFT_ARCH_TRIPLET_BUILD_FOR}/mir/server-platform
   MIR_SERVER_X11_WINDOW_TITLE: ${SNAP_INSTANCE_NAME}
 
 apps:
@@ -62,9 +62,9 @@ apps:
     command: usr/bin/mir_demo_server --test-client $SNAP/qml/spinning-rect.sh
     environment:
       # Prep for Qt wayland
-      QT_PLUGIN_PATH: ${SNAP}/usr/lib/${CRAFT_ARCH_TRIPLET}/qt5/plugins/
-      QT_QPA_PLATFORM_PLUGIN_PATH: ${SNAP}/usr/lib/${CRAFT_ARCH_TRIPLET}/qt5/plugins/platforms/
-      QML2_IMPORT_PATH: ${SNAP}/usr/lib/${CRAFT_ARCH_TRIPLET}/qt5/qml
+      QT_PLUGIN_PATH: ${SNAP}/usr/lib/${CRAFT_ARCH_TRIPLET_BUILD_FOR}/qt5/plugins/
+      QT_QPA_PLATFORM_PLUGIN_PATH: ${SNAP}/usr/lib/${CRAFT_ARCH_TRIPLET_BUILD_FOR}/qt5/plugins/platforms/
+      QML2_IMPORT_PATH: ${SNAP}/usr/lib/${CRAFT_ARCH_TRIPLET_BUILD_FOR}/qt5/qml
 
   # GTK3+ example
   gtk3-test:
@@ -117,8 +117,8 @@ layout:
     bind: $SNAP/usr/share/fonts
   /usr/share/icons:
     bind: $SNAP/usr/share/icons
-  /usr/lib/$CRAFT_ARCH_TRIPLET/gdk-pixbuf-2.0:
-    symlink: $SNAP/usr/lib/$CRAFT_ARCH_TRIPLET/gdk-pixbuf-2.0
+  /usr/lib/$CRAFT_ARCH_TRIPLET_BUILD_FOR/gdk-pixbuf-2.0:
+    symlink: $SNAP/usr/lib/$CRAFT_ARCH_TRIPLET_BUILD_FOR/gdk-pixbuf-2.0
   /usr/share/glmark2:
     symlink: $SNAP/usr/share/glmark2
   /usr/share/drirc.d:  # Used by mesa-core24 for app specific workarounds
@@ -133,8 +133,8 @@ layout:
     symlink: $SNAP/usr/bin/Xwayland
   /usr/bin/xkbcomp:
     symlink: $SNAP/usr/bin/xkbcomp
-  /usr/lib/${CRAFT_ARCH_TRIPLET}/pulseaudio:
-    symlink: $SNAP/usr/lib/${CRAFT_ARCH_TRIPLET}/pulseaudio
+  /usr/lib/${CRAFT_ARCH_TRIPLET_BUILD_FOR}/pulseaudio:
+    symlink: $SNAP/usr/lib/${CRAFT_ARCH_TRIPLET_BUILD_FOR}/pulseaudio
   # these could be avoided through a desktop plug
   /etc/gtk-3.0:
     bind: $SNAP/etc/gtk-3.0
@@ -203,11 +203,11 @@ parts:
     override-prime: |
       craftctl default
       # Compile the gsettings schemas
-      /usr/lib/${CRAFT_ARCH_TRIPLET}/glib-2.0/glib-compile-schemas "$CRAFT_PRIME/usr/share/glib-2.0/schemas"
+      /usr/lib/${CRAFT_ARCH_TRIPLET_BUILD_FOR}/glib-2.0/glib-compile-schemas "$CRAFT_PRIME/usr/share/glib-2.0/schemas"
       # Index the pixbuf loaders
-      GDK_PIXBUF_MODULEDIR=$CRAFT_PRIME/usr/lib/${CRAFT_ARCH_TRIPLET}/gdk-pixbuf-2.0/2.10.0/loaders \
-      "/usr/lib/$CRAFT_ARCH_TRIPLET/gdk-pixbuf-2.0/gdk-pixbuf-query-loaders" > "$CRAFT_PRIME/usr/lib/$CRAFT_ARCH_TRIPLET/gdk-pixbuf-2.0/2.10.0/loaders.cache"
-      sed s!$CRAFT_PRIME!!g --in-place "$CRAFT_PRIME/usr/lib/$CRAFT_ARCH_TRIPLET/gdk-pixbuf-2.0/2.10.0/loaders.cache"
+      GDK_PIXBUF_MODULEDIR=$CRAFT_PRIME/usr/lib/${CRAFT_ARCH_TRIPLET_BUILD_FOR}/gdk-pixbuf-2.0/2.10.0/loaders \
+      "/usr/lib/$CRAFT_ARCH_TRIPLET_BUILD_FOR/gdk-pixbuf-2.0/gdk-pixbuf-query-loaders" > "$CRAFT_PRIME/usr/lib/$CRAFT_ARCH_TRIPLET_BUILD_FOR/gdk-pixbuf-2.0/2.10.0/loaders.cache"
+      sed s!$CRAFT_PRIME!!g --in-place "$CRAFT_PRIME/usr/lib/$CRAFT_ARCH_TRIPLET_BUILD_FOR/gdk-pixbuf-2.0/2.10.0/loaders.cache"
 
   mir-flutter-app:
     plugin: flutter
