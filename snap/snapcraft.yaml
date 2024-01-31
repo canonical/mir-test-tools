@@ -36,6 +36,16 @@ apps:
       - bin/wrapper
       - bin/graphics-core24-wrapper
     command: usr/bin/mir-smoke-test-runner
+    plugs: &plugs
+      - audio-playback
+      - graphics-core24
+      - login-session-control
+      - network-bind
+      - opengl
+      - pulseaudio
+      - x11
+    slots: &slots
+      - wayland
 
   # SDL2 example
   sdl2-test:
@@ -43,8 +53,8 @@ apps:
       - bin/wrapper
       - bin/graphics-core24-wrapper
     command: usr/bin/mir_demo_server --test-client neverputt
-    plugs:
-      - pulseaudio
+    plugs: *plugs
+    slots: *slots
     environment:
       # Alsa config
       ALSA_CONFIG_DIR: $SNAP/usr/share/alsa
@@ -60,6 +70,8 @@ apps:
       - bin/wrapper
       - bin/graphics-core24-wrapper
     command: usr/bin/mir_demo_server --test-client $SNAP/qml/spinning-rect.sh
+    plugs: *plugs
+    slots: *slots
     environment:
       # Prep for Qt wayland
       QT_PLUGIN_PATH: ${SNAP}/usr/lib/${CRAFT_ARCH_TRIPLET_BUILD_FOR}/qt5/plugins/
@@ -72,6 +84,8 @@ apps:
       - bin/wrapper
       - bin/graphics-core24-wrapper
     command: usr/bin/mir_demo_server --test-client $SNAP/gtkapp.sh
+    plugs: *plugs
+    slots: *slots
     environment:
       PATH: $SNAP/bin/:$SNAP/usr/bin/:${SNAP}/usr/games:${PATH}
 
@@ -89,8 +103,8 @@ apps:
       - bin/wrapper
       - bin/graphics-core24-wrapper
     command: usr/bin/mir_performance_tests
-    plugs:
-      - network-bind
+    plugs: *plugs
+    slots: *slots
 
   demo-server:
     command-chain:
@@ -98,19 +112,14 @@ apps:
       - bin/wrapper
       - bin/graphics-core24-wrapper
     command: usr/bin/mir_demo_server
+    plugs: *plugs
+    slots: *slots
 
 plugs:
-  # For Mir
-  opengl:
-  x11:
-  login-session-control:
   graphics-core24:
     interface: content
     target: $SNAP/graphics
     default-provider: mesa-core24
-
-slots:
-  wayland:
 
 layout:
   /usr/share/fonts:
