@@ -131,7 +131,7 @@ layout:
   /usr/share/X11/locale:
     symlink: $SNAP/graphics/X11/locale
   /usr/share/X11/xkb:
-    symlink: $SNAP/usr/share/X11/xkb
+    bind: $SNAP/usr/share/X11/xkb
   /usr/bin/Xwayland:
     symlink: $SNAP/usr/bin/Xwayland
   /usr/bin/xkbcomp:
