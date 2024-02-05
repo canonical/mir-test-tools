@@ -248,6 +248,8 @@ parts:
   xwayland:
     plugin: nil
     stage-packages:
+      - x11-xkb-utils
+      - xkb-data
       - xwayland
       - libbz2-1.0
 
