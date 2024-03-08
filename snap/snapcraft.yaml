@@ -3,7 +3,9 @@ adopt-info: mir-test-tools
 summary: Mir test scripts and applications
 description: Mir test scripts and applications
 confinement: strict
-base: core22
+base: core24
+build-base: devel
+grade: devel
 
 architectures:
   - build-on: amd64
@@ -27,24 +29,34 @@ environment:
   XDG_CONFIG_DIRS: $SNAP/etc/xdg
   XDG_CACHE_HOME:  $SNAP_USER_COMMON/.cache
   # Prep for Mir
-  MIR_SERVER_PLATFORM_PATH: ${SNAP}/usr/lib/${CRAFT_ARCH_TRIPLET}/mir/server-platform
+  MIR_SERVER_PLATFORM_PATH: ${SNAP}/usr/lib/${CRAFT_ARCH_TRIPLET_BUILD_FOR}/mir/server-platform
   MIR_SERVER_X11_WINDOW_TITLE: ${SNAP_INSTANCE_NAME}
 
 apps:
   smoke-test:
     command-chain:
       - bin/wrapper
-      - bin/graphics-core22-wrapper
+      - bin/graphics-core24-wrapper
     command: usr/bin/mir-smoke-test-runner
+    plugs: &plugs
+      - audio-playback
+      - graphics-core24
+      - login-session-control
+      - network-bind
+      - opengl
+      - pulseaudio
+      - x11
+    slots: &slots
+      - wayland
 
   # SDL2 example
   sdl2-test:
     command-chain:
       - bin/wrapper
-      - bin/graphics-core22-wrapper
+      - bin/graphics-core24-wrapper
     command: usr/bin/mir_demo_server --test-client neverputt
-    plugs:
-      - pulseaudio
+    plugs: *plugs
+    slots: *slots
     environment:
       # Alsa config
       ALSA_CONFIG_DIR: $SNAP/usr/share/alsa
@@ -58,20 +70,24 @@ apps:
   qt-test:
     command-chain:
       - bin/wrapper
-      - bin/graphics-core22-wrapper
+      - bin/graphics-core24-wrapper
     command: usr/bin/mir_demo_server --test-client $SNAP/qml/spinning-rect.sh
+    plugs: *plugs
+    slots: *slots
     environment:
       # Prep for Qt wayland
-      QT_PLUGIN_PATH: ${SNAP}/usr/lib/${CRAFT_ARCH_TRIPLET}/qt5/plugins/
-      QT_QPA_PLATFORM_PLUGIN_PATH: ${SNAP}/usr/lib/${CRAFT_ARCH_TRIPLET}/qt5/plugins/platforms/
-      QML2_IMPORT_PATH: ${SNAP}/usr/lib/${CRAFT_ARCH_TRIPLET}/qt5/qml
+      QT_PLUGIN_PATH: ${SNAP}/usr/lib/${CRAFT_ARCH_TRIPLET_BUILD_FOR}/qt5/plugins/
+      QT_QPA_PLATFORM_PLUGIN_PATH: ${SNAP}/usr/lib/${CRAFT_ARCH_TRIPLET_BUILD_FOR}/qt5/plugins/platforms/
+      QML2_IMPORT_PATH: ${SNAP}/usr/lib/${CRAFT_ARCH_TRIPLET_BUILD_FOR}/qt5/qml
 
   # GTK3+ example
   gtk3-test:
     command-chain:
       - bin/wrapper
-      - bin/graphics-core22-wrapper
+      - bin/graphics-core24-wrapper
     command: usr/bin/mir_demo_server --test-client $SNAP/gtkapp.sh
+    plugs: *plugs
+    slots: *slots
     environment:
       PATH: $SNAP/bin/:$SNAP/usr/bin/:${SNAP}/usr/games:${PATH}
 
@@ -79,54 +95,49 @@ apps:
     command-chain:
       - bin/performance-env.sh
       - bin/wrapper
-      - bin/graphics-core22-wrapper
+      - bin/graphics-core24-wrapper
     command: usr/bin/mir_performance_tests
-    plugs:
-      - network-bind
+    plugs: *plugs
+    slots: *slots
 
   demo-server:
     command-chain:
       - bin/server-wrapper
       - bin/wrapper
-      - bin/graphics-core22-wrapper
+      - bin/graphics-core24-wrapper
     command: usr/bin/mir_demo_server
+    plugs: *plugs
+    slots: *slots
 
 plugs:
-  # For Mir
-  opengl:
-  x11:
-  login-session-control:
-  graphics-core22:
+  graphics-core24:
     interface: content
     target: $SNAP/graphics
-    default-provider: mesa-core22
-
-slots:
-  wayland:
+#    default-provider: mesa-core24
 
 layout:
   /usr/share/fonts:
     bind: $SNAP/usr/share/fonts
   /usr/share/icons:
     bind: $SNAP/usr/share/icons
-  /usr/lib/$CRAFT_ARCH_TRIPLET/gdk-pixbuf-2.0:
-    symlink: $SNAP/usr/lib/$CRAFT_ARCH_TRIPLET/gdk-pixbuf-2.0
+  /usr/lib/$CRAFT_ARCH_TRIPLET_BUILD_FOR/gdk-pixbuf-2.0:
+    symlink: $SNAP/usr/lib/$CRAFT_ARCH_TRIPLET_BUILD_FOR/gdk-pixbuf-2.0
   /usr/share/glmark2:
     symlink: $SNAP/usr/share/glmark2
-  /usr/share/drirc.d:  # Used by mesa-core22 for app specific workarounds
+  /usr/share/drirc.d:  # Used by mesa-core24 for app specific workarounds
     symlink: $SNAP/graphics/drirc.d
   /usr/share/X11/XErrorDB:
     symlink: $SNAP/graphics/X11/XErrorDB
   /usr/share/X11/locale:
     symlink: $SNAP/graphics/X11/locale
   /usr/share/X11/xkb:
-    symlink: $SNAP/usr/share/X11/xkb
+    bind: $SNAP/usr/share/X11/xkb
   /usr/bin/Xwayland:
     symlink: $SNAP/usr/bin/Xwayland
   /usr/bin/xkbcomp:
     symlink: $SNAP/usr/bin/xkbcomp
-  /usr/lib/${CRAFT_ARCH_TRIPLET}/pulseaudio:
-    symlink: $SNAP/usr/lib/${CRAFT_ARCH_TRIPLET}/pulseaudio
+  /usr/lib/${CRAFT_ARCH_TRIPLET_BUILD_FOR}/pulseaudio:
+    symlink: $SNAP/usr/lib/${CRAFT_ARCH_TRIPLET_BUILD_FOR}/pulseaudio
   # these could be avoided through a desktop plug
   /etc/gtk-3.0:
     bind: $SNAP/etc/gtk-3.0
@@ -143,7 +154,7 @@ parts:
       git config --global --add safe.directory ${CRAFT_PROJECT_DIR}
       recipe_version=`git -C ${CRAFT_PROJECT_DIR} rev-list --count HEAD`
       craftctl set version=$mir_version-snap$recipe_version
-      if echo $mir_version | grep -e '+dev' -e '~rc' -q; then craftctl set grade=devel; else craftctl set grade=stable; fi
+      #if echo $mir_version | grep -e '+dev' -e '~rc' -q; then craftctl set grade=devel; else craftctl set grade=stable; fi
     stage-packages:
     - fonts-freefont-ttf
     - mir-graphics-drivers-desktop
@@ -194,11 +205,11 @@ parts:
     override-prime: |
       craftctl default
       # Compile the gsettings schemas
-      /usr/lib/${CRAFT_ARCH_TRIPLET}/glib-2.0/glib-compile-schemas "$CRAFT_PRIME/usr/share/glib-2.0/schemas"
+      /usr/lib/${CRAFT_ARCH_TRIPLET_BUILD_FOR}/glib-2.0/glib-compile-schemas "$CRAFT_PRIME/usr/share/glib-2.0/schemas"
       # Index the pixbuf loaders
-      GDK_PIXBUF_MODULEDIR=$CRAFT_PRIME/usr/lib/${CRAFT_ARCH_TRIPLET}/gdk-pixbuf-2.0/2.10.0/loaders \
-      "/usr/lib/$CRAFT_ARCH_TRIPLET/gdk-pixbuf-2.0/gdk-pixbuf-query-loaders" > "$CRAFT_PRIME/usr/lib/$CRAFT_ARCH_TRIPLET/gdk-pixbuf-2.0/2.10.0/loaders.cache"
-      sed s!$CRAFT_PRIME!!g --in-place "$CRAFT_PRIME/usr/lib/$CRAFT_ARCH_TRIPLET/gdk-pixbuf-2.0/2.10.0/loaders.cache"
+      GDK_PIXBUF_MODULEDIR=$CRAFT_PRIME/usr/lib/${CRAFT_ARCH_TRIPLET_BUILD_FOR}/gdk-pixbuf-2.0/2.10.0/loaders \
+      "/usr/lib/$CRAFT_ARCH_TRIPLET_BUILD_FOR/gdk-pixbuf-2.0/gdk-pixbuf-query-loaders" > "$CRAFT_PRIME/usr/lib/$CRAFT_ARCH_TRIPLET_BUILD_FOR/gdk-pixbuf-2.0/2.10.0/loaders.cache"
+      sed s!$CRAFT_PRIME!!g --in-place "$CRAFT_PRIME/usr/lib/$CRAFT_ARCH_TRIPLET_BUILD_FOR/gdk-pixbuf-2.0/2.10.0/loaders.cache"
 
   performance:
     plugin: dump
@@ -216,15 +227,17 @@ parts:
   xwayland:
     plugin: nil
     stage-packages:
+      - x11-xkb-utils
+      - xkb-data
       - xwayland
       - libbz2-1.0
 
-  graphics-core22:
+  graphics-core:
     after: [mir-test-tools, icons, sdl2-apps, qmldemo, gtk3app, performance, wrapper, xwayland]
-    source: https://github.com/MirServer/graphics-core22.git
+    source: https://github.com/MirServer/graphics-core.git
     plugin: dump
     override-prime: |
       craftctl default
-      ${CRAFT_PART_SRC}/bin/graphics-core22-cleanup mesa-core22
+      ${CRAFT_PART_SRC}/bin/graphics-core24-cleanup mesa-core24
     prime:
-      - bin/graphics-core22-wrapper
+      - bin/graphics-core24-wrapper
