@@ -147,6 +147,7 @@ parts:
     stage-packages:
     - fonts-freefont-ttf
     - mir-graphics-drivers-desktop
+    - mir-platform-graphics-virtual
     - mir-test-tools
     - glmark2-es2
     - glmark2-data
