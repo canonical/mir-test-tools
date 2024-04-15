@@ -5,11 +5,11 @@ description: Mir test scripts and applications
 confinement: strict
 base: core24
 
-architectures:
-  - build-on: amd64
-  - build-on: arm64
-  - build-on: armhf
-  - build-on: riscv64
+platforms:
+  amd64:
+  arm64:
+  armhf:
+  riscv64:
 
 package-repositories:
   - type: apt
