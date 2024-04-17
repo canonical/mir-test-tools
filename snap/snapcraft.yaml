@@ -34,11 +34,11 @@ apps:
   smoke-test:
     command-chain:
       - bin/wrapper
-      - bin/graphics-core24-wrapper
+      - bin/gpu-2404-wrapper
     command: usr/bin/mir-smoke-test-runner
     plugs: &plugs
       - audio-playback
-      - graphics-core24
+      - gpu-2404
       - login-session-control
       - network-bind
       - opengl
@@ -51,7 +51,7 @@ apps:
   sdl2-test:
     command-chain:
       - bin/wrapper
-      - bin/graphics-core24-wrapper
+      - bin/gpu-2404-wrapper
     command: usr/bin/mir_demo_server --test-client neverputt
     plugs: *plugs
     slots: *slots
@@ -68,7 +68,7 @@ apps:
   qt-test:
     command-chain:
       - bin/wrapper
-      - bin/graphics-core24-wrapper
+      - bin/gpu-2404-wrapper
     command: usr/bin/mir_demo_server --test-client $SNAP/qml/spinning-rect.sh
     plugs: *plugs
     slots: *slots
@@ -82,7 +82,7 @@ apps:
   gtk3-test:
     command-chain:
       - bin/wrapper
-      - bin/graphics-core24-wrapper
+      - bin/gpu-2404-wrapper
     command: usr/bin/mir_demo_server --test-client $SNAP/gtkapp.sh
     plugs: *plugs
     slots: *slots
@@ -94,14 +94,14 @@ apps:
     command-chain:
       - bin/server-wrapper
       - bin/wrapper
-      - bin/graphics-core24-wrapper
+      - bin/gpu-2404-wrapper
     command: usr/bin/mir_demo_server --test-client $SNAP/mir_flutter_app.sh --test-timeout 120
 
   performance-test:
     command-chain:
       - bin/performance-env.sh
       - bin/wrapper
-      - bin/graphics-core24-wrapper
+      - bin/gpu-2404-wrapper
     command: usr/bin/mir_performance_tests
     plugs: *plugs
     slots: *slots
@@ -110,16 +110,16 @@ apps:
     command-chain:
       - bin/server-wrapper
       - bin/wrapper
-      - bin/graphics-core24-wrapper
+      - bin/gpu-2404-wrapper
     command: usr/bin/mir_demo_server
     plugs: *plugs
     slots: *slots
 
 plugs:
-  graphics-core24:
+  gpu-2404:
     interface: content
-    target: $SNAP/graphics
-    default-provider: mesa-core24
+    target: $SNAP/gpu-2404
+    default-provider: mesa-2404
 
 layout:
   /usr/share/fonts:
@@ -130,12 +130,10 @@ layout:
     symlink: $SNAP/usr/lib/$CRAFT_ARCH_TRIPLET_BUILD_FOR/gdk-pixbuf-2.0
   /usr/share/glmark2:
     symlink: $SNAP/usr/share/glmark2
-  /usr/share/drirc.d:  # Used by mesa-core24 for app specific workarounds
-    symlink: $SNAP/graphics/drirc.d
+  /usr/share/drirc.d:  # Used by mesa-2404 for app specific workarounds
+    symlink: $SNAP/gpu-2404/drirc.d
   /usr/share/X11/XErrorDB:
-    symlink: $SNAP/graphics/X11/XErrorDB
-  /usr/share/X11/locale:
-    symlink: $SNAP/graphics/X11/locale
+    symlink: $SNAP/gpu-2404/X11/XErrorDB
   /usr/share/X11/xkb:
     symlink: $SNAP/usr/share/X11/xkb
   /usr/bin/Xwayland:
@@ -253,12 +251,12 @@ parts:
       - xwayland
       - libbz2-1.0
 
-  graphics-core:
+  gpu-snap:
     after: [mir-test-tools, icons, sdl2-apps, qmldemo, gtk3app, mir-flutter-app, performance, wrapper, xwayland]
-    source: https://github.com/canonical/graphics-core.git
+    source: https://github.com/canonical/gpu-snap.git
     plugin: dump
     override-prime: |
       craftctl default
-      ${CRAFT_PART_SRC}/bin/graphics-core24-cleanup mesa-core24
+      ${CRAFT_PART_SRC}/bin/gpu-2404-cleanup mesa-2404
     prime:
-      - bin/graphics-core24-wrapper
+      - bin/gpu-2404-wrapper

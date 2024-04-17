@@ -40,6 +40,6 @@ export MIR_MESA_KMS_DISABLE_MODESET_PROBE=
 
 # Use any quirks the driver needs
 mkdir -p "${XDG_CONFIG_HOME}/mir"
-ln -sf "${SNAP}/graphics/etc/mir-quirks" "${XDG_CONFIG_HOME}/mir/mir_demo_server.config"
+ln -sf "${SNAP}/gpu/etc/mir-quirks" "${XDG_CONFIG_HOME}/mir/mir_demo_server.config"
 
 exec "$@"
