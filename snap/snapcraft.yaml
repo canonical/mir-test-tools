@@ -204,7 +204,7 @@ parts:
     stage-packages:
       - gnome-sudoku
     build-packages: # These are actually for override-prime - which needs them in the build environment
-      - libglib2.0-0
+      - libglib2.0-0t64
       - libgdk-pixbuf2.0-0
       - librsvg2-dev # So the libpixbufloader-svg.so loader can be loaded by gdk-pixbuf-query-loaders
     override-prime: |
