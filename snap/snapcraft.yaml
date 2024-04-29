@@ -75,6 +75,14 @@ apps:
     environment:
       PATH: $SNAP/bin/:$SNAP/usr/bin/:${SNAP}/usr/games:${PATH}
 
+  # Reference application for Mir window semantics
+  mir-flutter-app:
+    command-chain:
+      - bin/server-wrapper
+      - bin/wrapper
+      - bin/graphics-core22-wrapper
+    command: usr/bin/mir_demo_server --test-client $SNAP/mir_flutter_app.sh --test-timeout 120
+
   performance-test:
     command-chain:
       - bin/performance-env.sh
@@ -201,6 +209,35 @@ parts:
       "/usr/lib/$CRAFT_ARCH_TRIPLET/gdk-pixbuf-2.0/gdk-pixbuf-query-loaders" > "$CRAFT_PRIME/usr/lib/$CRAFT_ARCH_TRIPLET/gdk-pixbuf-2.0/2.10.0/loaders.cache"
       sed s!$CRAFT_PRIME!!g --in-place "$CRAFT_PRIME/usr/lib/$CRAFT_ARCH_TRIPLET/gdk-pixbuf-2.0/2.10.0/loaders.cache"
 
+  mir-flutter-app:
+    plugin: nil
+    source: https://github.com/hbatagelo/mir_flutter_app.git
+    build-snaps:
+      - flutter/latest/stable
+    build-environment:
+      - C_INCLUDE_PATH: /snap/flutter/current/usr/include
+      - LD_LIBRARY_PATH: ${LD_LIBRARY_PATH:+$LD_LIBRARY_PATH:}/snap/flutter/current/usr/lib/$CRAFT_ARCH_TRIPLET
+      - PKG_CONFIG_PATH: ${PKG_CONFIG_PATH:+$PKG_CONFIG_PATH:}/snap/flutter/current/usr/lib/$CRAFT_ARCH_TRIPLET/pkgconfig
+      - XDG_DATA_DIRS: /snap/flutter/current/usr/share${XDG_DATA_DIRS:+:$XDG_DATA_DIRS}
+    override-build: |
+      set -eux
+      mkdir -p $CRAFT_PART_INSTALL/bin/lib
+      flutter channel stable
+      flutter upgrade
+      flutter config --enable-linux-desktop
+      flutter doctor
+      flutter pub get
+      flutter build linux --release -v
+      cp -r build/linux/*/release/bundle/* $CRAFT_PART_INSTALL/bin/
+    stage-packages:
+      - fonts-ubuntu
+      - libgtk-3-0
+      - libgl1
+
+  mir-flutter-app-launcher:
+    plugin: dump
+    source: mir-flutter-app
+
   performance:
     plugin: dump
     source: performance
@@ -221,7 +258,7 @@ parts:
       - libbz2-1.0
 
   graphics-core22:
-    after: [mir-test-tools, icons, sdl2-apps, qmldemo, gtk3app, performance, wrapper, xwayland]
+    after: [mir-test-tools, icons, sdl2-apps, qmldemo, gtk3app, mir-flutter-app, performance, wrapper, xwayland]
     source: https://github.com/MirServer/graphics-core22.git
     plugin: dump
     override-prime: |
