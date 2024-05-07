@@ -220,7 +220,10 @@ parts:
     plugin: flutter
     flutter-target: lib/main.dart
     source: https://github.com/hbatagelo/mir_flutter_app.git
-    build-packages: [libgtk-3-dev, ninja-build]
+    build-packages:
+      - curl
+      - libgtk-3-dev
+      - ninja-build
     stage-packages:
       - fonts-ubuntu
       - libgtk-3-0
