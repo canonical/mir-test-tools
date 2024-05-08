@@ -45,7 +45,7 @@ apps:
       - pulseaudio
       - x11
     slots: &slots
-      - wayland
+      - wayslot
 
   # SDL2 example
   sdl2-test:
@@ -90,13 +90,15 @@ apps:
       PATH: $SNAP/bin/:$SNAP/usr/bin/:${SNAP}/usr/games:${PATH}
 
   # Reference application for Mir window semantics
-  mir-flutter-app:
+  flutter-app:
     command-chain:
-      - bin/wrapper
+      - bin/wayland-launch
       - bin/gpu-2404-wrapper
-    command: usr/bin/mir_demo_server --test-client $SNAP/mir_flutter_app.sh --test-timeout 120
-    plugs: *plugs
-    slots: *slots
+    command: mir_flutter_app
+    plugs:
+    - gpu-2404
+    - opengl
+    - wayland
 
   performance-test:
     command-chain:
@@ -121,6 +123,10 @@ plugs:
     interface: content
     target: $SNAP/gpu-2404
     default-provider: mesa-2404
+
+slots:
+  wayslot:
+    interface: wayland
 
 layout:
   /usr/share/fonts:
@@ -219,8 +225,7 @@ parts:
 
   mir-flutter-app:
     plugin: flutter
-    flutter-target: lib/main.dart
-    source: https://github.com/hbatagelo/mir_flutter_app.git
+    source: mir-flutter-app
     build-packages:
       - curl
       - libgtk-3-dev
@@ -229,10 +234,6 @@ parts:
       - fonts-ubuntu
       - libgtk-3-0t64
       - libgl1
-
-  mir-flutter-app-launcher:
-    plugin: dump
-    source: mir-flutter-app
 
   performance:
     plugin: dump
