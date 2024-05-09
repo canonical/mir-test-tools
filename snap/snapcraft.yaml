@@ -255,8 +255,21 @@ parts:
       - xwayland
       - libbz2-1.0
 
+  wayland-launch:
+    plugin: dump
+    source: wayland-launch
+    override-build: |
+      # The plugs needed to run Wayland. (wayland-launch checks them, setup.sh connects them)
+      # You may add further plugs here if you want these options
+      PLUGS="opengl wayland gpu-2404"
+      sed --in-place "s/%PLUGS%/$PLUGS/g" $CRAFT_PART_BUILD/bin/wayland-launch
+      sed --in-place "s/%PLUGS%/$PLUGS/g" $CRAFT_PART_BUILD/bin/setup.sh
+      craftctl default
+    stage-packages:
+      - inotify-tools
+
   gpu-snap:
-    after: [mir-test-tools, icons, sdl2-apps, qmldemo, gtk3app, mir-flutter-app, performance, wrapper, xwayland]
+    after: [mir-test-tools, icons, sdl2-apps, qmldemo, gtk3app, mir-flutter-app, performance, wrapper, xwayland, wayland-launch]
     source: https://github.com/canonical/gpu-snap.git
     plugin: dump
     override-prime: |
