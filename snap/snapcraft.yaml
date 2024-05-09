@@ -205,23 +205,8 @@ parts:
   gtk3app:
     plugin: dump
     source: gtk3
-    override-build: |
-      craftctl default
-      update-mime-database $CRAFT_PART_INSTALL/usr/share/mime
     stage-packages:
       - gnome-sudoku
-    build-packages: # These are actually for override-prime - which needs them in the build environment
-      - libglib2.0-0t64
-      - libgdk-pixbuf2.0-0
-      - librsvg2-dev # So the libpixbufloader-svg.so loader can be loaded by gdk-pixbuf-query-loaders
-    override-prime: |
-      craftctl default
-      # Compile the gsettings schemas
-      /usr/lib/${CRAFT_ARCH_TRIPLET_BUILD_FOR}/glib-2.0/glib-compile-schemas "$CRAFT_PRIME/usr/share/glib-2.0/schemas"
-      # Index the pixbuf loaders
-      GDK_PIXBUF_MODULEDIR=$CRAFT_PRIME/usr/lib/${CRAFT_ARCH_TRIPLET_BUILD_FOR}/gdk-pixbuf-2.0/2.10.0/loaders \
-      "/usr/lib/$CRAFT_ARCH_TRIPLET_BUILD_FOR/gdk-pixbuf-2.0/gdk-pixbuf-query-loaders" > "$CRAFT_PRIME/usr/lib/$CRAFT_ARCH_TRIPLET_BUILD_FOR/gdk-pixbuf-2.0/2.10.0/loaders.cache"
-      sed s!$CRAFT_PRIME!!g --in-place "$CRAFT_PRIME/usr/lib/$CRAFT_ARCH_TRIPLET_BUILD_FOR/gdk-pixbuf-2.0/2.10.0/loaders.cache"
 
   mir-flutter-app:
     plugin: flutter
@@ -260,8 +245,6 @@ parts:
     plugin: dump
     source: wayland-launch
     override-build: |
-      # The plugs needed to run Wayland. (wayland-launch checks them, setup.sh connects them)
-      # You may add further plugs here if you want these options
       PLUGS="opengl wayland gpu-2404"
       sed --in-place "s/%PLUGS%/$PLUGS/g" $CRAFT_PART_BUILD/bin/wayland-launch
       sed --in-place "s/%PLUGS%/$PLUGS/g" $CRAFT_PART_BUILD/bin/setup.sh
@@ -269,8 +252,44 @@ parts:
     stage-packages:
       - inotify-tools
 
+  gsettings+pixbuf+immodules:
+    after: [gtk3app]
+    plugin: nil
+    build-packages:
+      - libgdk-pixbuf2.0-0
+      - librsvg2-common
+      - shared-mime-info
+      - libgtk-3-0
+    override-build: |
+      craftctl default
+      update-mime-database ${CRAFT_PART_INSTALL}/usr/share/mime
+      mkdir -p ${CRAFT_PART_INSTALL}/usr/lib/${CRAFT_ARCH_TRIPLET_BUILD_FOR}/gtk-3.0/3.0.0/
+      /usr/lib/${CRAFT_ARCH_TRIPLET_BUILD_FOR}/libgtk-3-0t64/gtk-query-immodules-3.0 > ${CRAFT_PART_INSTALL}/usr/lib/${CRAFT_ARCH_TRIPLET_BUILD_FOR}/gtk-3.0/3.0.0/immodules.cache
+    stage-packages:
+      - librsvg2-common
+      - gsettings-desktop-schemas
+      - libglib2.0-bin
+    override-prime: |
+      craftctl default
+      /usr/lib/${CRAFT_ARCH_TRIPLET_BUILD_FOR}/glib-2.0/glib-compile-schemas "$CRAFT_PRIME/usr/share/glib-2.0/schemas"
+      LOADERS_PATH=$(echo ${CRAFT_PRIME}/usr/lib/${CRAFT_ARCH_TRIPLET_BUILD_FOR}/gdk-pixbuf-2.0/*/loaders)
+      QUERY_LOADERS=/usr/lib/${CRAFT_ARCH_TRIPLET_BUILD_FOR}/gdk-pixbuf-2.0/gdk-pixbuf-query-loaders
+      GDK_PIXBUF_MODULEDIR=${LOADERS_PATH} ${QUERY_LOADERS} > ${LOADERS_PATH}/../loaders.cache
+      sed s!$CRAFT_PRIME!!g --in-place ${LOADERS_PATH}/../loaders.cache
+
   gpu-snap:
-    after: [mir-test-tools, icons, sdl2-apps, qmldemo, gtk3app, mir-flutter-app, performance, wrapper, xwayland, wayland-launch]
+    after:
+      - mir-test-tools
+      - icons
+      - sdl2-apps
+      - qmldemo
+      - gtk3app
+      - mir-flutter-app
+      - performance
+      - wrapper
+      - xwayland
+      - wayland-launch
+      - gsettings+pixbuf+immodules
     source: https://github.com/canonical/gpu-snap.git
     plugin: dump
     override-prime: |
