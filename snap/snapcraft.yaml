@@ -226,7 +226,7 @@ parts:
       - ninja-build
     stage-packages:
       - fonts-ubuntu
-      - libgtk-3-0
+      - libgtk-3-0t64
       - libgl1
 
   mir-flutter-app-launcher:
