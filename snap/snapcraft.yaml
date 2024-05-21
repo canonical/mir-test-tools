@@ -211,6 +211,8 @@ parts:
   mir-flutter-app:
     plugin: flutter
     source: mir-flutter-app
+    # TODO: limit this when Snapcraft advanced grammar is fixed:
+    # https://bugs.launchpad.net/snapcraft/+bug/2066280
     build-packages:
       - curl
       - libgtk-3-dev
@@ -219,6 +221,12 @@ parts:
       - fonts-ubuntu
       - libgtk-3-0t64
       - libgl1
+    override-build: |
+      if [[ "${CRAFT_ARCH_BUILD_FOR}" != @(amd64|arm64) ]]; then
+        install --mode 755 --no-target-directory mir_flutter_app.fake ${CRAFT_PART_INSTALL}/mir_flutter_app
+      else
+        craftctl default
+      fi
 
   performance:
     plugin: dump
