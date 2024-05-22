@@ -92,10 +92,11 @@ apps:
   # Reference application for Mir window semantics
   mir-flutter-app:
     command-chain:
-      - bin/server-wrapper
       - bin/wrapper
       - bin/gpu-2404-wrapper
     command: usr/bin/mir_demo_server --test-client $SNAP/mir_flutter_app.sh --test-timeout 120
+    plugs: *plugs
+    slots: *slots
 
   performance-test:
     command-chain:
