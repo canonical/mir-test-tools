@@ -1,0 +1,10 @@
+.cache
+.clang-format
+.clang-tidy
+.dart_tool
+.vscode
+build
+Makefile
+CMakeFiles
+cmake_install.cmake
+intermediates_do_not_run
