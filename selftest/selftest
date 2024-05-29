@@ -1,0 +1,25 @@
+#! /bin/bash
+
+set -e
+
+if [ -x "$(command -v fgconsole)" ]
+then
+    trap "sudo chvt $(sudo fgconsole)" EXIT
+fi
+
+if [ -v DISPLAY ]
+then
+    snap run mir-test-tools.gtk3-test
+    snap run mir-test-tools.qt-test
+    snap run mir-test-tools.sdl2-test
+    snap run mir-test-tools.smoke-test
+    snap run mir-test-tools.performance-test
+fi
+
+sudo snap run mir-test-tools.gtk3-test
+sudo snap run mir-test-tools.qt-test
+sudo snap run mir-test-tools.sdl2-test
+sudo snap run mir-test-tools.smoke-test
+sudo snap run mir-test-tools.performance-test
+
+echo All tests passed

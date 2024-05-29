@@ -241,6 +241,12 @@ parts:
       wrapper: bin/wrapper
       server-wrapper: bin/server-wrapper
 
+  selftest:
+    plugin: dump
+    source: selftest
+    organize:
+      selftest: bin/selftest
+
   xwayland:
     plugin: nil
     stage-packages:
