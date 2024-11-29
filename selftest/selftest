@@ -25,7 +25,7 @@ fi
 
 unset DISPLAY
 
-if [ "$XDG_SESSION_TYPE" = "wayland" ] && [ -O "${MIR_SERVER_WAYLAND_HOST}" ]
+if [ "$XDG_SESSION_TYPE" = "wayland" ] && [ -O "${XDG_RUNTIME_DIR}/${MIR_SERVER_WAYLAND_HOST}" ]
 then
     export MIR_SERVER_PLATFORM_DISPLAY_LIBS=mir:wayland
     sudo snap connect mir-test-tools:wayland
