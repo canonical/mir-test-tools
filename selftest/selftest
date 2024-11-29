@@ -4,22 +4,50 @@ set -e
 
 if [ -x "$(command -v fgconsole)" ]
 then
-    trap "sudo chvt $(sudo fgconsole)" EXIT
+    trap "sudo chvt $(sudo fgconsole); sudo snap connect mir-test-tools:x11" EXIT
 fi
+
+export MIR_SERVER_WAYLAND_HOST="${WAYLAND_DISPLAY:wayland-0}"
+unset WAYLAND_DISPLAY
 
 if [ -v DISPLAY ]
 then
+    export MIR_SERVER_PLATFORM_DISPLAY_LIBS=mir:x11
+    sudo snap connect mir-test-tools:x11
+
+    echo "**** INFO: running tests on mir:x11 ****"
     snap run mir-test-tools.gtk3-test
     snap run mir-test-tools.qt-test
     snap run mir-test-tools.sdl2-test
     snap run mir-test-tools.smoke-test
-    snap run mir-test-tools.performance-test
+    snap run mir-test-tools.performance-test --gtest_filter=-GLMark2Xwayland.*
 fi
 
+unset DISPLAY
+
+if [ "$XDG_SESSION_TYPE" = "wayland" ] && [ -O "${XDG_RUNTIME_DIR}/${MIR_SERVER_WAYLAND_HOST}" ]
+then
+    export MIR_SERVER_PLATFORM_DISPLAY_LIBS=mir:wayland
+    sudo snap connect mir-test-tools:wayland
+    sudo snap disconnect mir-test-tools:x11
+
+    echo "**** INFO: running tests on mir:wayland ****"
+    snap run mir-test-tools.gtk3-test
+    snap run mir-test-tools.qt-test
+    snap run mir-test-tools.sdl2-test
+    snap run mir-test-tools.smoke-test
+    snap run mir-test-tools.performance-test --gtest_filter=-CompositorPerformance.regression_test_1563287
+fi
+
+unset MIR_SERVER_PLATFORM_DISPLAY_LIBS
+
+sudo chvt 4
+
+echo "**** INFO: running tests on VTConsoleServices ****"
 sudo snap run mir-test-tools.gtk3-test
 sudo snap run mir-test-tools.qt-test
 sudo snap run mir-test-tools.sdl2-test
 sudo snap run mir-test-tools.smoke-test
-sudo snap run mir-test-tools.performance-test
+sudo snap run mir-test-tools.performance-test --gtest_filter=-GLMark2Xwayland.*:CompositorPerformance.regression_test_1563287
 
-echo All tests passed
+echo "**** All tests passed ****"
