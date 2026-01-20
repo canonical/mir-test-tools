@@ -5,6 +5,7 @@
 #include <cairo.h>
 #include <linux/input-event-codes.h>
 
+#include <algorithm>
 #include <functional>
 #include <numbers>
 #include <string>

@@ -3,7 +3,7 @@ adopt-info: mir-test-tools
 summary: Mir test scripts and applications
 description: Mir test scripts and applications
 confinement: strict
-base: core24
+base: core26
 
 platforms:
   amd64:
@@ -34,11 +34,11 @@ apps:
   smoke-test:
     command-chain:
       - bin/wrapper
-      - bin/gpu-2404-wrapper
+      - bin/gpu-2604-wrapper
     command: usr/bin/mir-smoke-test-runner
     plugs: &plugs
       - audio-playback
-      - gpu-2404
+      - gpu-2604
       - login-session-control
       - network-bind
       - opengl
@@ -51,7 +51,7 @@ apps:
   sdl2-test:
     command-chain:
       - bin/wrapper
-      - bin/gpu-2404-wrapper
+      - bin/gpu-2604-wrapper
     command: usr/bin/mir_demo_server --test-client neverputt
     plugs: *plugs
     slots: *slots
@@ -68,7 +68,7 @@ apps:
   qt-test:
     command-chain:
       - bin/wrapper
-      - bin/gpu-2404-wrapper
+      - bin/gpu-2604-wrapper
     command: usr/bin/mir_demo_server --test-client $SNAP/qml/spinning-rect.sh
     plugs: *plugs
     slots: *slots
@@ -82,7 +82,7 @@ apps:
   gtk3-test:
     command-chain:
       - bin/wrapper
-      - bin/gpu-2404-wrapper
+      - bin/gpu-2604-wrapper
     command: usr/bin/mir_demo_server --test-client $SNAP/gtkapp.sh
     plugs: *plugs
     slots: *slots
@@ -93,10 +93,10 @@ apps:
   flutter-app:
     command-chain:
       - bin/wayland-launch
-      - bin/gpu-2404-wrapper
+      - bin/gpu-2604-wrapper
     command: mir_flutter_app
     plugs:
-    - gpu-2404
+    - gpu-2604
     - opengl
     - wayland
 
@@ -104,7 +104,7 @@ apps:
     command-chain:
       - bin/performance-env.sh
       - bin/wrapper
-      - bin/gpu-2404-wrapper
+      - bin/gpu-2604-wrapper
     command: usr/bin/mir_performance_tests
     plugs: *plugs
     slots: *slots
@@ -113,16 +113,16 @@ apps:
     command-chain:
       - bin/server-wrapper
       - bin/wrapper
-      - bin/gpu-2404-wrapper
+      - bin/gpu-2604-wrapper
     command: usr/bin/mir_demo_server
     plugs: *plugs
     slots: *slots
 
 plugs:
-  gpu-2404:
+  gpu-2604:
     interface: content
-    target: $SNAP/gpu-2404
-    default-provider: mesa-2404
+    target: $SNAP/gpu-2604
+    default-provider: mesa-2604
 
 slots:
   wayslot:
@@ -137,10 +137,8 @@ layout:
     symlink: $SNAP/usr/lib/$CRAFT_ARCH_TRIPLET_BUILD_FOR/gdk-pixbuf-2.0
   /usr/share/glmark2:
     symlink: $SNAP/usr/share/glmark2
-  /usr/share/drirc.d:  # Used by mesa-2404 for app specific workarounds
-    symlink: $SNAP/gpu-2404/drirc.d
   /usr/share/X11/XErrorDB:
-    symlink: $SNAP/gpu-2404/X11/XErrorDB
+    symlink: $SNAP/gpu-2604/usr/share/X11/XErrorDB
   /usr/share/X11/xkb:
     symlink: $SNAP/usr/share/X11/xkb
   /usr/bin/Xwayland:
@@ -259,7 +257,7 @@ parts:
     plugin: dump
     source: wayland-launch
     override-build: |
-      PLUGS="opengl wayland gpu-2404"
+      PLUGS="opengl wayland gpu-2604"
       sed --in-place "s/%PLUGS%/$PLUGS/g" $CRAFT_PART_BUILD/bin/wayland-launch
       sed --in-place "s/%PLUGS%/$PLUGS/g" $CRAFT_PART_BUILD/bin/setup.sh
       craftctl default
@@ -270,7 +268,7 @@ parts:
     after: [gtk3app]
     plugin: nil
     build-packages:
-      - libgdk-pixbuf2.0-0
+      - libgdk-pixbuf-2.0-0
       - librsvg2-common
       - shared-mime-info
       - libgtk-3-0t64
@@ -308,6 +306,6 @@ parts:
     plugin: dump
     override-prime: |
       craftctl default
-      ${CRAFT_PART_SRC}/bin/gpu-2404-cleanup mesa-2404
+      ${CRAFT_PART_SRC}/bin/gpu-2604-cleanup mesa-2604
     prime:
-      - bin/gpu-2404-wrapper
+      - bin/gpu-2604-wrapper
