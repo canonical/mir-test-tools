@@ -3,7 +3,7 @@ name: Refresh downstreams
 on:
   push:
     branches:
-    - main
+    - core26
 
 jobs:
   Refresh:
@@ -11,11 +11,14 @@ jobs:
 
     timeout-minutes: 5
 
+    permissions:
+      contents: write
+
     strategy:
       fail-fast: false
       matrix:
         ref:
-        - mir-libs-build
+        - 26/mir-libs-build
 
     steps:
     - name: Check out code
