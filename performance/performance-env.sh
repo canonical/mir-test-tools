@@ -2,7 +2,7 @@
 
 if ! snapctl is-connected x11; then
   # For X11 we need .X11-unix/ in the snap's /tmp directory
-  mkdir -p /tmp/.X11-unix
+  mkdir --mode 777 --parents /tmp/.X11-unix
   # We also need to avoid any sockets already used by the system
   touch /tmp/.X11-unix/X{0,1,2,3,4,5}
 else
