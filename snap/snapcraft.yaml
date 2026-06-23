@@ -11,12 +11,6 @@ platforms:
   armhf:
   riscv64:
 
-package-repositories:
-  - type: apt
-    ppa: mir-team/release
-  - type: apt
-    ppa: graphics-drivers/ppa
-
 environment:
   LC_ALL: C.UTF-8
   XCURSOR_PATH: $SNAP/usr/share/icons
@@ -156,11 +150,21 @@ layout:
     bind: $SNAP/etc/fonts
 
 parts:
+  mir:
+    plugin: nil
+    stage-snaps:
+    - mir-libs/24/edge
+    stage:
+    - -*.h
+    - -*.pc
+    - -share
+
   mir-test-tools:
+    after: [mir]
     plugin: nil
     override-build: |
       craftctl default
-      mir_version=`LANG=C apt-cache policy mir-test-tools | sed -rne 's/^\s+Candidate:\s+([^-]*)-.+$/\1/p'`
+      mir_version=$( sed -rne 's/^version:\s+([^-]*)-.+$/\1/p' ${CRAFT_STAGE}/meta.mir-libs/snap.yaml )
       # work around https://github.com/diddlesnaps/snapcraft-multiarch-action/issues/22
       git config --global --add safe.directory ${CRAFT_PROJECT_DIR}
       recipe_version=`git -C ${CRAFT_PROJECT_DIR} rev-list --count HEAD`
@@ -168,13 +172,10 @@ parts:
       if echo $mir_version | grep -e '+dev' -e '~rc' -q; then craftctl set grade=devel; else craftctl set grade=stable; fi
     stage-packages:
     - fonts-freefont-ttf
-    - mir-graphics-drivers-desktop
-    - mir-platform-graphics-virtual
-    - mir-test-tools
     - glmark2-es2
     - glmark2-data
     - glmark2-es2-wayland
-    - on amd64: [mir-graphics-drivers-nvidia]
+    - mesa-utils
 
   icons:
     plugin: nil
