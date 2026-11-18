@@ -137,8 +137,6 @@ layout:
     symlink: $SNAP/usr/lib/$CRAFT_ARCH_TRIPLET_BUILD_FOR/gdk-pixbuf-2.0
   /usr/share/glmark2:
     symlink: $SNAP/usr/share/glmark2
-  /usr/share/X11/XErrorDB:
-    symlink: $SNAP/gpu-2604/usr/share/X11/XErrorDB
   /usr/share/X11/xkb:
     symlink: $SNAP/usr/share/X11/xkb
   /usr/bin/Xwayland:
